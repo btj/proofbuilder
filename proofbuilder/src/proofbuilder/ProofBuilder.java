@@ -2,39 +2,48 @@ package proofbuilder;
 
 import static proofbuilder.coq.Term.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import proofbuilder.coq.Constant;
+import proofbuilder.coq.Context;
 import proofbuilder.coq.Term;
+import proofbuilder.coq.parser.Parser;
 
 public class ProofBuilder {
 	
-	static Constant and = new Constant("and", impl(prop, impl(prop, prop)));
+	static Map<String, Constant> constants = new HashMap<String, Constant>();
 	
-	public static Term and(Term conj1, Term conj2) {
-		return app(and, conj1, conj2);
+	static Term parse(String text) {
+		return Parser.parseTerm(constants, text);
+	}
+	
+	static Term parseType(String text) {
+		Term result = parse(text);
+		result.checkIsType();
+		return result;
+	}
+	
+	static void parameter(String name, String type) {
+		constants.put(name, new Constant(name, parseType(type)));
 	}
 	
 	public static void main(String[] args) {
-		Term object = new Constant("object", type);
-		Term m = new Constant("m", impl(object, prop));
-		Term s = new Constant("s", impl(object, prop));
-		Term S = new Constant("S", object);
-		Term and_cases = new Constant("and_cases",
-				prod("P", prop,
-						prod("Q", prop,
-								prod("R", prop,
-										impl(and(var("P"), var("Q")),
-												impl(impl(var("P"), impl(var("Q"), var("R"))),
-														var("R")))))));
+		parameter("and", "Prop -> Prop -> Prop");
+		parameter("and_cases", "forall (P: Prop) (Q: Prop) (R: Prop), and P Q -> (P -> Q -> R) -> R");
 		
-		Term premiseType = and(
-				prod("x", object, impl(app(m, var("x")), app(s, var("x")))),
-				app(m, S));
-		Term socratesProof = abs("H", premiseType,
-				app(and_cases, var("H"),
-						abs("H1", prod("x", object, impl(app(m, var("x")), app(s, var("x")))),
-							abs("H2", app(m, S),
-									app(var("H1"), S, var("H2"))))));
-						
+		parameter("object", "Type");
+		parameter("m", "object -> Prop");
+		parameter("s", "object -> Prop");
+		parameter("S", "object");
+		
+		Term socratesProof = parse("""
+				fun H: and (forall x: object, m x -> s x) (m S) =>
+				and_cases (forall x: object, m x -> s x) (m S) (s S) H (fun (H1: forall x: object, m x -> s x) (H2: m S) =>
+				  H1 S H2
+				)
+				""");
+		socratesProof.checkAgainst(Context.empty, parseType("and (forall x: object, m x -> s x) (m S) -> s S"));
 	}
 
 }
