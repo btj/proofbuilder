@@ -3,8 +3,10 @@ package proofbuilder;
 import static proofbuilder.coq.Term.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import proofbuilder.coq.Application;
 import proofbuilder.coq.Constant;
 import proofbuilder.coq.Context;
 import proofbuilder.coq.ProofTree;
@@ -29,12 +31,21 @@ public class ProofBuilder {
 		constants.put(name, new Constant(name, parseType(type)));
 	}
 	
+	static void infixOperator(String name, String type, String operatorLaTeX, int precedence, int leftPrec, int rightPrec) {
+		constants.put(name, new Constant(name, parseType(type), operatorLaTeX, 2) {
+			@Override
+			public String toLaTeX(Context context, List<Term> arguments, int targetPrecedence) {
+				return parenthesize(targetPrecedence, precedence, arguments.get(0).toLaTeX(context, leftPrec) + " " + operatorLaTeX + " " + arguments.get(1).toLaTeX(context, rightPrec));
+			}
+		});
+	}
+	
 	static void rule(String name, String type, String laTeX, int nbArgs) {
 		constants.put(name, new Constant(name, parseType(type), laTeX, nbArgs));
 	}
 	
 	public static void main(String[] args) {
-		parameter("and", "Prop -> Prop -> Prop");
+		infixOperator("and", "Prop -> Prop -> Prop", "\\land", Term.PREC_CONJ, Term.PREC_CONJ + 1, Term.PREC_CONJ);
 		rule("and_proj1", "forall (P: Prop) (Q: Prop), and P Q -> P", "\\land_{E^1}", 3);
 		rule("and_proj2", "forall (P: Prop) (Q: Prop), and P Q -> Q", "\\land_{E^2}", 3);
 		

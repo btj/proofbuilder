@@ -1,6 +1,7 @@
 package proofbuilder.coq;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Constant extends Term {
 	
@@ -37,6 +38,10 @@ public class Constant extends Term {
 	
 	public String toLaTeX(Context context, int precedence) {
 		return "\\mathsf{" + name + "}";
+	}
+	
+	public String toLaTeX(Context context, List<Term> arguments, int precedence) {
+		return "\\mathsf{" + name + "}(" + arguments.stream().map(arg -> arg.toLaTeX(context, 0)).collect(Collectors.joining(", ")) + ")";
 	}
 	
 	public String getRuleAsLaTeX(Context context) {
