@@ -44,6 +44,8 @@ public class ProofBuilder {
 				)
 				""");
 		socratesProof.checkAgainst(Context.empty, parseType("and (forall x: object, m x -> s x) (m S) -> s S"));
+		
+		ProofBuilderFrame.showFrame(args);
 	}
 
 }
