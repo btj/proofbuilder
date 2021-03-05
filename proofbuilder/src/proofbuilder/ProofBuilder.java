@@ -29,14 +29,14 @@ public class ProofBuilder {
 		constants.put(name, new Constant(name, parseType(type)));
 	}
 	
-	static void rule(String name, String type, String laTeX) {
-		constants.put(name, new Constant(name, parseType(type), laTeX));
+	static void rule(String name, String type, String laTeX, int nbArgs) {
+		constants.put(name, new Constant(name, parseType(type), laTeX, nbArgs));
 	}
 	
 	public static void main(String[] args) {
 		parameter("and", "Prop -> Prop -> Prop");
-		rule("and_proj1", "forall (P: Prop) (Q: Prop), and P Q -> P", "\\land_{E^1}");
-		rule("and_proj2", "forall (P: Prop) (Q: Prop), and P Q -> Q", "\\land_{E^2}");
+		rule("and_proj1", "forall (P: Prop) (Q: Prop), and P Q -> P", "\\land_{E^1}", 3);
+		rule("and_proj2", "forall (P: Prop) (Q: Prop), and P Q -> Q", "\\land_{E^2}", 3);
 		
 		parameter("object", "Type");
 		parameter("m", "object -> Prop");

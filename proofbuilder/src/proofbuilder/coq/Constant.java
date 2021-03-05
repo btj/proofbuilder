@@ -7,11 +7,17 @@ public class Constant extends Term {
 	public final String name;
 	public final String ruleLaTeX;
 	public final Term type;
+	public final int nbArguments;
 	
-	public Constant(String name, Term type, String ruleLaTeX) {
+	public Constant(String name, Term type, String ruleLaTeX, int nbArguments) {
 		this.name = name;
 		this.type = type;
 		this.ruleLaTeX = ruleLaTeX;
+		this.nbArguments = nbArguments;
+	}
+	
+	public Constant(String name, Term type, String ruleLaTeX) {
+		this(name, type, ruleLaTeX, 0);
 	}
 	
 	public Constant(String name, Term type) {

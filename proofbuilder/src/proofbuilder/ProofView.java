@@ -37,7 +37,7 @@ public class ProofView {
 		this.proofTree = proofTree;
 		this.typeIcon = new TeXFormula(proofTree.getType().toLaTeX(proofTree.context, 0)).createTeXIcon(TeXConstants.STYLE_DISPLAY, LATEX_POINT_SIZE);
 		this.ruleIcon = new TeXFormula(proofTree.getRuleAsLaTeX()).createTeXIcon(TeXConstants.STYLE_DISPLAY, LATEX_POINT_SIZE);
-		children = proofTree.children.stream().filter(tree -> tree.actualType.isAProp(tree.context)).map(tree -> new ProofView(tree)).toArray(n -> new ProofView[n]);
+		children = proofTree.uncurriedChildren.stream().filter(tree -> tree.actualType.isAProp(tree.context)).map(tree -> new ProofView(tree)).toArray(n -> new ProofView[n]);
 	}
 	
 	void computeLayout() {
