@@ -54,6 +54,10 @@ public abstract class Term {
 	
 	public abstract ProofTree check(Context context);
 	
+	public boolean isAProp(Context context) {
+		return check(context).actualType instanceof PropSort;
+	}
+	
 	public void checkIsType() {
 		Term type = check(Context.empty).actualType;
 		if (!(type instanceof Sort))

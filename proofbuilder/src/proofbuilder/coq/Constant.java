@@ -5,11 +5,17 @@ import java.util.List;
 public class Constant extends Term {
 	
 	public final String name;
+	public final String ruleLaTeX;
 	public final Term type;
 	
-	public Constant(String name, Term type) {
+	public Constant(String name, Term type, String ruleLaTeX) {
 		this.name = name;
 		this.type = type;
+		this.ruleLaTeX = ruleLaTeX;
+	}
+	
+	public Constant(String name, Term type) {
+		this(name, type, "\\textsc{" + name.replace("_", "\\_") + "}");
 	}
 	
 	@Override
@@ -28,7 +34,7 @@ public class Constant extends Term {
 	}
 	
 	public String getRuleAsLaTeX(Context context) {
-		return "\\textsc{" + name + "}";
+		return ruleLaTeX;
 	}
 
 }

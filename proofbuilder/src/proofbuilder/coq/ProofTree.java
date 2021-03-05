@@ -31,7 +31,7 @@ public class ProofTree {
 	
 	public String getRuleAsLaTeX() {
 		if (term instanceof Lambda)
-			return ((Product)getType()).boundVariable == null ? "\\Rightarrow_I" : "\\forall_I";
+			return (((Product)getType()).boundVariable == null ? "\\Rightarrow" : "\\forall") + "_{I^" + children.get(1).context.getVariableName(0) + "}";
 		else if (term instanceof PropSort)
 			return "\\mathsf{Prop}";
 		else if (term instanceof TypeSort)
@@ -40,18 +40,11 @@ public class ProofTree {
 			return "\\Pi";
 		else if (term instanceof Variable)
 			return term.toLaTeX(context, 0);
-		else {
-			Term head = term.getHead();
-			if (head instanceof Constant constant)
-				return constant.getRuleAsLaTeX(context);
-			else {
-				Application app = (Application)term;
-				Product funcType = (Product)children.get(0).actualType;
-				if (funcType.boundVariable == null)
-					return "\\Rightarrow_E";
-				else
-					return "\\forall_E";
-			}
-		}
+		else if (term instanceof Application)
+			return ((Product)children.get(0).getType()).boundVariable == null ? "\\Rightarrow_E" : "\\forall_E";
+		else if (term instanceof Constant constant) {
+			return constant.getRuleAsLaTeX(context);
+		} else
+			throw new AssertionError();
 	}
 }

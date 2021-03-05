@@ -29,9 +29,14 @@ public class ProofBuilder {
 		constants.put(name, new Constant(name, parseType(type)));
 	}
 	
+	static void rule(String name, String type, String laTeX) {
+		constants.put(name, new Constant(name, parseType(type), laTeX));
+	}
+	
 	public static void main(String[] args) {
 		parameter("and", "Prop -> Prop -> Prop");
-		parameter("and_cases", "forall (P: Prop) (Q: Prop) (R: Prop), and P Q -> (P -> Q -> R) -> R");
+		rule("and_proj1", "forall (P: Prop) (Q: Prop), and P Q -> P", "\\land_{E^1}");
+		rule("and_proj2", "forall (P: Prop) (Q: Prop), and P Q -> Q", "\\land_{E^2}");
 		
 		parameter("object", "Type");
 		parameter("m", "object -> Prop");
@@ -39,10 +44,8 @@ public class ProofBuilder {
 		parameter("S", "object");
 		
 		Term socratesProof = parse("""
-				fun H: and (forall x: object, m x -> s x) (m S) =>
-				and_cases (forall x: object, m x -> s x) (m S) (s S) H (fun (H1: forall x: object, m x -> s x) (H2: m S) =>
-				  H1 S H2
-				)
+				fun u: and (forall x: object, m x -> s x) (m S) =>
+				  and_proj1 (forall x: object, m x -> s x) (m S) u S (and_proj2 (forall x: object, m x -> s x) (m S) u)
 				""");
 		ProofTree proofTree = socratesProof.checkAgainst(Context.empty, parseType("and (forall x: object, m x -> s x) (m S) -> s S"));
 		
