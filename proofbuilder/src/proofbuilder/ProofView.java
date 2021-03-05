@@ -60,7 +60,7 @@ public class ProofView {
 		}
 		ruleWidth = Math.max(childrenHeadsWidth, typeIcon.getIconWidth());
 		ruleCenter = Math.max(ruleWidth / 2, childrenHeadsWidth / 2 + firstChildLeftOverhang);
-		width = ruleCenter + ruleWidth / 2 + Math.max(RULE_ICON_SPACING + ruleIcon.getIconWidth(), lastChildRightOverhang);
+		width = ruleCenter + Math.max(ruleWidth / 2 + RULE_ICON_SPACING + ruleIcon.getIconWidth(), childrenHeadsWidth / 2 + lastChildRightOverhang);
 		ruleY = Math.max(childrenHeight + RULE_SPACING + RULE_HEIGHT, ruleIcon.getIconHeight() / 2);
 		height = ruleY + RULE_SPACING + typeIcon.getIconHeight();
 		
