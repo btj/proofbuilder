@@ -7,6 +7,7 @@ import java.util.Map;
 
 import proofbuilder.coq.Constant;
 import proofbuilder.coq.Context;
+import proofbuilder.coq.ProofTree;
 import proofbuilder.coq.Term;
 import proofbuilder.coq.parser.Parser;
 
@@ -43,9 +44,9 @@ public class ProofBuilder {
 				  H1 S H2
 				)
 				""");
-		socratesProof.checkAgainst(Context.empty, parseType("and (forall x: object, m x -> s x) (m S) -> s S"));
+		ProofTree proofTree = socratesProof.checkAgainst(Context.empty, parseType("and (forall x: object, m x -> s x) (m S) -> s S"));
 		
-		ProofBuilderFrame.showFrame(args);
+		ProofBuilderFrame.showFrame(proofTree);
 	}
 
 }

@@ -1,6 +1,6 @@
 package proofbuilder.coq;
 
-import java.util.Map;
+import java.util.List;
 
 public class Constant extends Term {
 	
@@ -21,6 +21,14 @@ public class Constant extends Term {
 	
 	public Term with(Term term, int index) { return this; }
 	
-	public Term check(Context context) { return type; }
+	public ProofTree check(Context context) { return new ProofTree(context, this, type, null, List.of()); }
+	
+	public String toLaTeX(Context context, int precedence) {
+		return "\\mathsf{" + name + "}";
+	}
+	
+	public String getRuleAsLaTeX(Context context) {
+		return "\\textsc{" + name + "}";
+	}
 
 }

@@ -4,6 +4,7 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -51,18 +52,19 @@ public abstract class Term {
 		};
 	}
 	
-	public abstract Term check(Context context);
+	public abstract ProofTree check(Context context);
 	
 	public void checkIsType() {
-		Term type = check(Context.empty);
+		Term type = check(Context.empty).actualType;
 		if (!(type instanceof Sort))
 			throw typeError("Type expected");
 	}
 	
-	public void checkAgainst(Context context, Term expectedType) {
-		Term actualType = check(context);
-		if (!expectedType.equals(actualType))
-			throw typeError("Expected type: " + expectedType + "; actual type: " + actualType);
+	public ProofTree checkAgainst(Context context, Term expectedType) {
+		ProofTree proofTree = check(context);
+		if (!expectedType.equals(proofTree.actualType))
+			throw typeError("Expected type: " + expectedType + "; actual type: " + proofTree.actualType);
+		return proofTree.withExpectedType(expectedType);
 	}
 	
 	public abstract boolean equals(Term other);
@@ -70,5 +72,20 @@ public abstract class Term {
 	public abstract Term lift(int startIndex, int nbBindings);
 	
 	public abstract Term with(Term term, int index);
+	
+	public static final int PREC_FUNC = 100;
+	public static final int PREC_CONJ = 90;
+	public static final int PREC_IMPL = 80;
+	
+	public static String parenthesize(int targetPrecedence, int actualPrecedence, String text) {
+		if (targetPrecedence > actualPrecedence)
+			return "(" + text + ")";
+		else
+			return text;
+	}
+	
+	public abstract String toLaTeX(Context context, int precedence);
+	
+	public Term getHead() { return this; }
 
 }

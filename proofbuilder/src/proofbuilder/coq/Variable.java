@@ -1,6 +1,6 @@
 package proofbuilder.coq;
 
-import java.util.Map;
+import java.util.List;
 
 public class Variable extends Term {
 	
@@ -30,17 +30,23 @@ public class Variable extends Term {
 		return this;
 	}
 	
-	public Term check(Context context) {
+	public ProofTree check(Context context) {
+		Context bindingContext = context;
 		for (int i = 0; i < deBruijnIndex; i++) {
-			if (context instanceof NonemptyContext nonemptyContext) {
-				context = nonemptyContext.outerContext;
+			if (bindingContext instanceof NonemptyContext nonemptyContext) {
+				bindingContext = nonemptyContext.outerContext;
 			} else
 				throw typeError("Unbound variable");
 		}
-		if (context instanceof NonemptyContext nonemptyContext) {
-			return nonemptyContext.type.lift(0, deBruijnIndex + 1);
+		if (bindingContext instanceof NonemptyContext nonemptyContext) {
+			return new ProofTree(context, this, nonemptyContext.type.lift(0, deBruijnIndex + 1), null, List.of());
 		} else
 			throw typeError("Unbound variable");
+	}
+	
+	@Override
+	public String toLaTeX(Context context, int precedence) {
+		return context.getVariableName(deBruijnIndex);
 	}
 
 }

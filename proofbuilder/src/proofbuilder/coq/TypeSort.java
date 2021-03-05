@@ -1,6 +1,6 @@
 package proofbuilder.coq;
 
-import java.util.Map;
+import java.util.List;
 
 public class TypeSort extends Sort {
 
@@ -15,8 +15,12 @@ public class TypeSort extends Sort {
 		return other == this;
 	}
 	
-	public Term check(Context context) {
-		return Term.type(level + 1);
+	public ProofTree check(Context context) {
+		return new ProofTree(context, this, Term.type(level + 1), null, List.of());
+	}
+	
+	public String toLaTeX(Context context, int precedence) {
+		return "Type" + (level == 0 ? "" : "_" + level);
 	}
 	
 }

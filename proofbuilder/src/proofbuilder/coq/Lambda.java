@@ -1,6 +1,6 @@
 package proofbuilder.coq;
 
-import java.util.Map;
+import java.util.List;
 
 public class Lambda extends Term {
 
@@ -40,12 +40,17 @@ public class Lambda extends Term {
 		return new Lambda(boundVariable, newDomain, newBody);
 	}
 	
-	public Term check(Context context) {
-		Term domainType = domain.check(context);
-		if (!(domainType instanceof Sort))
+	public ProofTree check(Context context) {
+		ProofTree domainTree = domain.check(context);
+		if (!(domainTree.actualType instanceof Sort))
 			throw typeError("Domain of lambda must be a type");
-		Term bodyType = body.check(Context.cons(context, boundVariable, domain));
-		return new Product(boundVariable, domain, bodyType);
+		ProofTree bodyTree = body.check(Context.cons(context, boundVariable, domain));
+		return new ProofTree(context, this, new Product(boundVariable, domain, bodyTree.actualType), null, List.of(domainTree, bodyTree));
+	}
+	
+	public String toLaTeX(Context context, int precedence) {
+		return parenthesize(precedence, 0, "\\lambda " + boundVariable + ": " + domain.toLaTeX(context, 0) + ".\\; " +
+				body.toLaTeX(Context.cons(context, boundVariable, domain), 0));
 	}
 	
 }

@@ -1,6 +1,6 @@
 package proofbuilder.coq;
 
-import java.util.Map;
+import java.util.List;
 
 public class Product extends Term {
 
@@ -64,28 +64,38 @@ public class Product extends Term {
 			return range.with(argument, 0);
 	}
 	
-	public Term check(Context context) {
-		Term domainType = domain.check(context);
-		if (!(domainType instanceof Sort))
+	public ProofTree check(Context context) {
+		ProofTree domainTree = domain.check(context);
+		if (!(domainTree.actualType instanceof Sort))
 			throw typeError("Domain of product must be a type");
-		Term rangeType;
+		ProofTree rangeTree;
 		if (boundVariable == null)
-			rangeType = range.check(context);
+			rangeTree = range.check(context);
 		else
-			rangeType = range.check(Context.cons(context, boundVariable, domain));
-		if (!(rangeType instanceof Sort))
+			rangeTree = range.check(Context.cons(context, boundVariable, domain));
+		if (!(rangeTree.actualType instanceof Sort))
 			throw typeError("Range of product must be a type");
 		
-		if (domainType instanceof PropSort) {
-			return rangeType;
-		} else if (rangeType instanceof PropSort) {
-			return rangeType;
+		Term type;
+		if (domainTree.actualType instanceof PropSort) {
+			type = rangeTree.actualType;
+		} else if (rangeTree.actualType instanceof PropSort) {
+			type = rangeTree.actualType;
 		} else {
-			if (((TypeSort)domainType).level > ((TypeSort)rangeType).level)
-				return domainType;
+			if (((TypeSort)domainTree.actualType).level > ((TypeSort)rangeTree.actualType).level)
+				type = domainTree.actualType;
 			else
-				return rangeType;
+				type = rangeTree.actualType;
 		}
+		return new ProofTree(context, this, type, null, List.of(domainTree, rangeTree));
+	}
+	
+	public String toLaTeX(Context context, int precedence) {
+		if (boundVariable == null)
+			return parenthesize(precedence, PREC_IMPL, domain.toLaTeX(context, PREC_IMPL + 1) + " \\Rightarrow " + range.toLaTeX(context, PREC_IMPL));
+		else
+			return parenthesize(precedence, 0, "\\forall " + boundVariable + ": " + domain.toLaTeX(context, 0) + ".\\; " +
+					range.toLaTeX(Context.cons(context, boundVariable, domain), 0));
 	}
 	
 }

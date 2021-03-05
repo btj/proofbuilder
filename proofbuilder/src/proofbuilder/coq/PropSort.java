@@ -1,6 +1,6 @@
 package proofbuilder.coq;
 
-import java.util.Map;
+import java.util.List;
 
 public class PropSort extends Sort {
 	
@@ -11,8 +11,11 @@ public class PropSort extends Sort {
 		return other == this;
 	}
 	
-	public Term check(Context context) {
-		return Term.type(1);
+	public ProofTree check(Context context) {
+		return new ProofTree(context, this, Term.type(1), null, List.of());
 	}
 	
+	public String toLaTeX(Context context, int precedence) {
+		return "\\mathsf{Prop}";
+	}
 }
