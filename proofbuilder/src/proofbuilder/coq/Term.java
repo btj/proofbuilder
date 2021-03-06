@@ -70,14 +70,17 @@ public abstract class Term {
 			throw typeError("Type expected");
 	}
 	
+	public RuntimeException typeMismatchError(Term expectedType, Term actualType) {
+		return typeError("Expected type: " + expectedType + "; actual type: " + actualType);
+	}
+	
 	public ProofTree checkAgainst(Context context, Term expectedType) {
 		ProofTree proofTree = check(context);
-		if (!expectedType.equals(proofTree.actualType))
-			throw typeError("Expected type: " + expectedType + "; actual type: " + proofTree.actualType);
+		proofTree.actualType.checkEquals(expectedType);
 		return proofTree.withExpectedType(expectedType);
 	}
 	
-	public abstract boolean equals(Term other);
+	public abstract void checkEquals(Term other);
 	
 	public abstract Term lift(int startIndex, int nbBindings);
 	

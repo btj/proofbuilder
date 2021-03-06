@@ -40,11 +40,12 @@ public class Application extends Term {
 		this.uncurriedArguments = uncurriedArguments;
 	}
 	
-	public boolean equals(Term other) {
-		if (other instanceof Application app)
-			return function.equals(app.function) && argument.equals(app.argument); 
-		else
-			return false;
+	public void checkEquals(Term other) {
+		if (other instanceof Application app) {
+			function.checkEquals(app.function);
+			argument.checkEquals(app.argument);
+		} else
+			throw typeMismatchError(other, this);
 	}
 	
 	public Term lift(int startIndex, int nbBindings) {

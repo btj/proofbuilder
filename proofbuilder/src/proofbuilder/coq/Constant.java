@@ -26,8 +26,9 @@ public class Constant extends Term {
 	}
 	
 	@Override
-	public boolean equals(Term other) {
-		return this == other;
+	public void checkEquals(Term other) {
+		if (this != other)
+			throw typeMismatchError(other, this);
 	}
 	
 	public Term lift(int startIndex, int nbBindings) { return this; }

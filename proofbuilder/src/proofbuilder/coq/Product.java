@@ -15,22 +15,21 @@ public class Product extends Term {
 	}
 	
 	@Override
-	public boolean equals(Term other) {
+	public void checkEquals(Term other) {
 		if (other instanceof Product otherProduct) {
-			if (!domain.equals(otherProduct.domain))
-				return false;
+			domain.checkEquals(otherProduct.domain);
 			if (boundVariable == null)
 				if (otherProduct.boundVariable == null)
-					return range.equals(otherProduct.range);
+					range.checkEquals(otherProduct.range);
 				else
-					return range.lift(0, 1).equals(otherProduct.range);
+					range.lift(0, 1).checkEquals(otherProduct.range);
 			else
 				if (otherProduct.boundVariable == null)
-					return range.equals(otherProduct.range.lift(0,  1));
+					range.checkEquals(otherProduct.range.lift(0,  1));
 				else
-					return range.equals(otherProduct.range);
-		}
-		return false;
+					range.checkEquals(otherProduct.range);
+		} else
+			throw typeMismatchError(other, this);
 	}
 	
 	public Term lift(int startIndex, int nbBindings) {

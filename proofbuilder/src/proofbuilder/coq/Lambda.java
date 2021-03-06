@@ -15,13 +15,12 @@ public class Lambda extends Term {
 	}
 	
 	@Override
-	public boolean equals(Term other) {
+	public void checkEquals(Term other) {
 		if (other instanceof Lambda otherLambda) {
-			if (!domain.equals(otherLambda.domain))
-				return false;
-			return body.equals(otherLambda.body);
-		}
-		return false;
+			domain.checkEquals(otherLambda.domain);
+			body.checkEquals(otherLambda.body);
+		} else
+			throw typeMismatchError(other, this);
 	}
 	
 	public Term lift(int startIndex, int nbBindings) {

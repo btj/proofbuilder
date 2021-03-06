@@ -10,11 +10,6 @@ public class TypeSort extends Sort {
 		this.level = level;
 	}
 	
-	@Override
-	public boolean equals(Term other) {
-		return other == this;
-	}
-	
 	public ProofTree check(Context context) {
 		return new ProofTree(context, this, Term.type(level + 1), null, List.of());
 	}

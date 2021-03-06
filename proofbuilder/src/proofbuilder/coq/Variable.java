@@ -11,11 +11,9 @@ public class Variable extends Term {
 	}
 	
 	@Override
-	public boolean equals(Term other) {
-		if (other instanceof Variable otherVariable) {
-			return deBruijnIndex == otherVariable.deBruijnIndex;
-		}
-		return false;
+	public void checkEquals(Term other) {
+		if (!(other instanceof Variable otherVariable && deBruijnIndex == otherVariable.deBruijnIndex))
+			throw typeMismatchError(other, this);
 	}
 	
 	public Term lift(int startIndex, int nbBindings) {
