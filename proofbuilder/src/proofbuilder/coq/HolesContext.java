@@ -21,6 +21,14 @@ public class HolesContext {
 	private ArrayList<UndoStackEntry> undoStack = new ArrayList<>();
 	private ArrayList<Runnable> undoActions = new ArrayList<>();
 	
+	public int getNbUnfilledHoles() {
+		int result = 0;
+		for (Hole hole : holes)
+			if (!hole.isFilled())
+				result++;
+		return result;
+	}
+	
 	public Hole createHole() {
 		Hole result = new Hole(this, 1 + holes.size());
 		holes.add(result);

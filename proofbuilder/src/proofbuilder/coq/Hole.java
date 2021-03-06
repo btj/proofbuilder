@@ -117,5 +117,9 @@ public class Hole extends AbstractHole {
 			return contents.with(term, index);
 		throw new RuntimeException("Not yet implemented");
 	}
+
+	public boolean isFilled() {
+		return contents != null;
+	}
 	
 }

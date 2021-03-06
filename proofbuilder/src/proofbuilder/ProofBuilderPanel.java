@@ -32,7 +32,7 @@ public class ProofBuilderPanel extends JPanel {
 		
 		addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseClicked(MouseEvent e) {
+			public void mousePressed(MouseEvent e) {
 				proofView.handleParentMouseEvent(e);
 			}
 		});
