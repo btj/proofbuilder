@@ -41,6 +41,7 @@ public class Application extends Term {
 	}
 	
 	public void checkEquals(Term other) {
+		other = other.getHoleContents();
 		if (other instanceof Application app) {
 			function.checkEquals(app.function);
 			argument.checkEquals(app.argument);

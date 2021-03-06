@@ -6,7 +6,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.util.Arrays;
 
-import javax.swing.Action;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
@@ -14,6 +13,7 @@ import org.scilab.forge.jlatexmath.TeXConstants;
 import org.scilab.forge.jlatexmath.TeXFormula;
 import org.scilab.forge.jlatexmath.TeXIcon;
 
+import proofbuilder.coq.Application;
 import proofbuilder.coq.Hole;
 import proofbuilder.coq.Lambda;
 import proofbuilder.coq.Product;
@@ -101,6 +101,22 @@ public class ProofTreeView extends ProofViewComponent {
 							show = true;
 						}
 					} 
+					
+					{
+						JMenuItem item = new JMenuItem(new TeXFormula("\\Rightarrow_E").createTeXIcon(TeXConstants.STYLE_DISPLAY, LATEX_POINT_SIZE));
+						item.addActionListener((ActionEvent e) -> {
+							Hole antecedentHole = proofBuilderPanel.holesContext.createHole();
+							antecedentHole.checkAgainst(proofTree.context, Term.prop);
+							Hole functionHole = proofBuilderPanel.holesContext.createHole();
+							functionHole.checkAgainst(proofTree.context, new Product(null, antecedentHole, type));
+							Hole argumentHole = proofBuilderPanel.holesContext.createHole();
+							argumentHole.checkAgainst(proofTree.context, antecedentHole);
+							hole.checkEquals(new Application(functionHole, argumentHole));
+							proofBuilderPanel.termChanged();
+						});
+						menu.add(item);
+						show = true;
+					}
 				}
 				
 				if (show) {
