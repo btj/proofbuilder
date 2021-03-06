@@ -23,7 +23,7 @@ public abstract class Term {
 			typeSorts.add(new TypeSort(typeSorts.size()));
 		return typeSorts.get(level);
 	}
-	public static final TypeSort type = type(0);
+	public static final TypeSort typeSort = type(0);
 	public static Term var(int index) { return new Variable(index); }
 	public static Term abs(String x, Term domain, Term body) { return new Lambda(x, domain, body); }
 	public static Term prod(String x, Term domain, Term range) { return new Product(x, domain, range); }

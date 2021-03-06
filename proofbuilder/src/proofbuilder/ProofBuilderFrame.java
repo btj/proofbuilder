@@ -5,16 +5,17 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 
+import proofbuilder.coq.HolesContext;
 import proofbuilder.coq.ProofTree;
 
 public class ProofBuilderFrame extends JFrame {
 	
 	ProofBuilderPanel proofBuilderPanel;
 	
-	public ProofBuilderFrame(ProofTree proofTree) {
+	public ProofBuilderFrame(HolesContext holesContext, ProofTree proofTree) {
 		super("Proof Builder");
 		
-		proofBuilderPanel = new ProofBuilderPanel(proofTree);
+		proofBuilderPanel = new ProofBuilderPanel(holesContext, proofTree);
 		getContentPane().add(new JScrollPane(proofBuilderPanel));
 		pack();
 		setLocationRelativeTo(null);
@@ -22,9 +23,9 @@ public class ProofBuilderFrame extends JFrame {
 		setVisible(true);
 	}
 	
-	public static void showFrame(ProofTree proofTree) {
+	public static void showFrame(HolesContext holesContext, ProofTree proofTree) {
 		EventQueue.invokeLater(() -> {
-			new ProofBuilderFrame(proofTree);
+			new ProofBuilderFrame(holesContext, proofTree);
 		});
 	}
 

@@ -2,9 +2,11 @@ package proofbuilder;
 
 import java.awt.Graphics;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.util.Arrays;
 
+import javax.swing.Action;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
@@ -13,6 +15,7 @@ import org.scilab.forge.jlatexmath.TeXFormula;
 import org.scilab.forge.jlatexmath.TeXIcon;
 
 import proofbuilder.coq.Hole;
+import proofbuilder.coq.Lambda;
 import proofbuilder.coq.Product;
 import proofbuilder.coq.ProofTree;
 import proofbuilder.coq.Term;
@@ -38,10 +41,11 @@ public class ProofTreeView extends ProofViewComponent {
 	
 	ProofTreeView(ProofBuilderPanel proofBuilderPanel, ProofViewComponent parent, ProofTree proofTree) {
 		super(proofBuilderPanel, parent);
+		proofTree = proofTree.getHoleContents();
 		this.proofTree = proofTree;
 		this.typeIcon = new TeXFormula(proofTree.getType().toLaTeX(proofTree.context, 0)).createTeXIcon(TeXConstants.STYLE_DISPLAY, LATEX_POINT_SIZE);
 		this.ruleIcon = new TeXFormula(proofTree.getRuleAsLaTeX()).createTeXIcon(TeXConstants.STYLE_DISPLAY, LATEX_POINT_SIZE);
-		children = proofTree.uncurriedChildren.stream().filter(tree -> tree.actualType.isAProp(tree.context)).map(tree -> new ProofTreeView(proofBuilderPanel, this, tree)).toArray(n -> new ProofTreeView[n]);
+		children = proofTree.uncurriedChildren.stream().filter(tree -> tree != null && tree.actualType.isAProp(tree.context)).map(tree -> new ProofTreeView(proofBuilderPanel, this, tree)).toArray(n -> new ProofTreeView[n]);
 		childComponents.addAll(Arrays.asList(children));
 	}
 	
@@ -88,7 +92,12 @@ public class ProofTreeView extends ProofViewComponent {
 					Term type = hole.getType().getHoleContents();
 					if (type != null && type instanceof Product product) {
 						if (product.boundVariable == null) {
-							menu.add(new JMenuItem(new TeXFormula("\\Rightarrow_I").createTeXIcon(TeXConstants.STYLE_DISPLAY, LATEX_POINT_SIZE)));
+							JMenuItem item = new JMenuItem(new TeXFormula("\\Rightarrow_I").createTeXIcon(TeXConstants.STYLE_DISPLAY, LATEX_POINT_SIZE));
+							item.addActionListener((ActionEvent e) -> {
+								hole.checkEquals(new Lambda("u", product.domain, proofBuilderPanel.holesContext.createHole()));
+								proofBuilderPanel.termChanged();
+							});
+							menu.add(item);
 							show = true;
 						}
 					} 

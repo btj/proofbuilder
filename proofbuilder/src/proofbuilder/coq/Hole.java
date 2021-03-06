@@ -1,5 +1,6 @@
 package proofbuilder.coq;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class Hole extends Term {
@@ -9,6 +10,7 @@ public class Hole extends Term {
 	private Context context;
 	private Term type;
 	private Term contents;
+	private ProofTree[] childProofTrees = new ProofTree[1];
 	
 	public Term getType() {
 		return type;
@@ -21,10 +23,31 @@ public class Hole extends Term {
 	
 	@Override
 	public ProofTree check(Context context) {
+		if (contents != null) {
+			ProofTree contentsTree = contents.check(context);
+			childProofTrees[0] = contentsTree;
+			return new ProofTree(context, this, contentsTree.actualType, null, Arrays.asList(childProofTrees));
+		}
+		this.context = context;
+		if (type == null) {
+			Hole typeHole = holesContext.createHole();
+			typeHole.context = context;
+			type = typeHole;
+		}
+		return new ProofTree(context, this, type, null, Arrays.asList(childProofTrees));
+	}
+	
+	@Override
+	public ProofTree checkAgainst(Context context, Term expectedType) {
+		if (contents != null) {
+			ProofTree contentsTree = contents.checkAgainst(context, expectedType);
+			childProofTrees[0] = contentsTree;
+			return new ProofTree(context, this, contentsTree.actualType, expectedType, Arrays.asList(childProofTrees));
+		}
 		this.context = context;
 		if (type == null)
-			type = holesContext.createHole();
-		return new ProofTree(context, this, type, null, List.of());
+			type = expectedType;
+		return new ProofTree(context, this, type, type, Arrays.asList(childProofTrees));
 	}
 	
 	public Term getHoleContents() {
@@ -40,10 +63,11 @@ public class Hole extends Term {
 		other = other.getHoleContents();
 		if (other == this)
 			return;
+		if (context == null) throw new AssertionError();
 		if (type != null) {
-			if (context == null) throw new AssertionError();
-			other.checkAgainst(context, type);
-		}
+			childProofTrees[0] = other.checkAgainst(context, type);
+		} else
+			childProofTrees[0] = other.check(context);
 		contents = other;
 	}
 	

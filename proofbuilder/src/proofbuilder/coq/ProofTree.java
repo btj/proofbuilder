@@ -18,7 +18,7 @@ public class ProofTree {
 		this.term = term;
 		this.actualType = actualType;
 		this.expectedType = expectedType;
-		this.children = List.copyOf(children);
+		this.children = children;
 		
 		Constant uncurriedFunction = null;
 		int uncurriedNbArgs = 0;
@@ -46,6 +46,12 @@ public class ProofTree {
 			this.uncurriedChildren = children;
 	}
 	
+	public ProofTree getHoleContents() {
+		if (term instanceof Hole && children.get(0) != null)
+			return children.get(0).getHoleContents();
+		return this;
+	}
+	
 	public ProofTree withExpectedType(Term expectedType) {
 		return new ProofTree(context, term, actualType, expectedType, children);
 	}
@@ -58,9 +64,8 @@ public class ProofTree {
 	}
 	
 	public String getRuleAsLaTeX() {
-		Term term = this.term.getHoleContents();
 		if (term instanceof Lambda)
-			return (((Product)getType()).boundVariable == null ? "\\Rightarrow" : "\\forall") + "_{I^" + children.get(1).context.getVariableName(0) + "}";
+			return (((Product)getType().getHoleContents()).boundVariable == null ? "\\Rightarrow" : "\\forall") + "_{I^" + children.get(1).context.getVariableName(0) + "}";
 		else if (term instanceof PropSort)
 			return "\\mathsf{Prop}";
 		else if (term instanceof TypeSort)
@@ -77,8 +82,18 @@ public class ProofTree {
 		else if (term instanceof Constant constant) {
 			return constant.getRuleAsLaTeX(context);
 		} else if (term instanceof Hole hole) {
-			return "?_{" + hole.id + "}";
+			if (children.get(0) != null)
+				return children.get(0).getRuleAsLaTeX();
+			else
+				return "?_{" + hole.id + "}";
 		} else
 			throw new AssertionError();
+	}
+	
+	/**
+	 * Call this if the term changed (as a result of hole instantiations).
+	 */
+	public ProofTree refresh() {
+		return term.checkAgainst(context, getType());
 	}
 }

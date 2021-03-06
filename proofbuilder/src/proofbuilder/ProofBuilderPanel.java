@@ -8,19 +8,18 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.JPanel;
 
+import proofbuilder.coq.HolesContext;
 import proofbuilder.coq.ProofTree;
 
 public class ProofBuilderPanel extends JPanel {
 	
 	static final int MARGIN = 20;
 
+	HolesContext holesContext;
 	ProofTreeView proofView;
 	
-	ProofBuilderPanel(ProofTree proofTree) {
-		proofView = new ProofTreeView(this, null, proofTree);
-		proofView.computeLayout();
-		proofView.x = MARGIN;
-		proofView.y = MARGIN;
+	ProofBuilderPanel(HolesContext holesContext, ProofTree proofTree) {
+		this.holesContext = holesContext;
 		setBackground(Color.white);
 		
 		addMouseListener(new MouseAdapter() {
@@ -29,6 +28,21 @@ public class ProofBuilderPanel extends JPanel {
 				proofView.handleParentMouseEvent(e);
 			}
 		});
+		
+		setProofTree(proofTree);
+	}
+	
+	void setProofTree(ProofTree proofTree) {
+		proofView = new ProofTreeView(this, null, proofTree);
+		proofView.computeLayout();
+		proofView.x = MARGIN;
+		proofView.y = MARGIN;
+		revalidate();
+		repaint();
+	}
+	
+	void termChanged() {
+		setProofTree(proofView.proofTree.refresh());
 	}
 	
 	@Override

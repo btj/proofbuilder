@@ -16,6 +16,7 @@ public class Product extends Term {
 	
 	@Override
 	public void checkEquals(Term other) {
+		other = other.getHoleContents();
 		if (other instanceof Product otherProduct) {
 			domain.checkEquals(otherProduct.domain);
 			if (boundVariable == null)
