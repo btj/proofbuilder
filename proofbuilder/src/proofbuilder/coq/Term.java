@@ -80,7 +80,16 @@ public abstract class Term {
 		return proofTree.withExpectedType(expectedType);
 	}
 	
-	public abstract void checkEquals(Term other);
+	public abstract void checkEqualsCore(Term other);
+	
+	public final void checkEquals(Term other) {
+		Term thisTerm = this.getHoleContents();
+		Term otherTerm = other.getHoleContents();
+		if (other instanceof Hole)
+			other.checkEqualsCore(this);
+		else
+			checkEqualsCore(other);
+	}
 	
 	public abstract Term lift(int startIndex, int nbBindings);
 	
@@ -102,5 +111,17 @@ public abstract class Term {
 	public Term getHead() { return this; }
 	
 	public Term getHoleContents() { return this; }
+	public boolean unifiesWith(HolesContext holesContext, Term other) {
+		holesContext.push();
+		try {
+			this.checkEquals(other);
+			return true;
+		} catch (TypeException e) {
+			e.printStackTrace();
+		} finally {
+			holesContext.pop();
+		}
+		return false;
+	}
 
 }

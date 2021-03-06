@@ -57,13 +57,16 @@ public class Hole extends Term {
 	}
 	
 	@Override
-	public void checkEquals(Term other) {
+	public void checkEqualsCore(Term other) {
 		if (contents != null)
 			contents.checkEquals(other);
-		other = other.getHoleContents();
 		if (other == this)
 			return;
 		if (context == null) throw new AssertionError();
+		holesContext.addUndoAction(() -> {
+			childProofTrees[0] = null;
+			contents = null;
+		});
 		if (type != null) {
 			childProofTrees[0] = other.checkAgainst(context, type);
 		} else

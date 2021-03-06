@@ -15,7 +15,7 @@ public class Lambda extends Term {
 	}
 	
 	@Override
-	public void checkEquals(Term other) {
+	public void checkEqualsCore(Term other) {
 		if (other instanceof Lambda otherLambda) {
 			domain.checkEquals(otherLambda.domain);
 			body.checkEquals(otherLambda.body);

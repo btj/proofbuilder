@@ -11,7 +11,7 @@ public class Variable extends Term {
 	}
 	
 	@Override
-	public void checkEquals(Term other) {
+	public void checkEqualsCore(Term other) {
 		if (!(other instanceof Variable otherVariable && deBruijnIndex == otherVariable.deBruijnIndex))
 			throw typeMismatchError(other, this);
 	}

@@ -14,11 +14,14 @@ import org.scilab.forge.jlatexmath.TeXFormula;
 import org.scilab.forge.jlatexmath.TeXIcon;
 
 import proofbuilder.coq.Application;
+import proofbuilder.coq.Context;
 import proofbuilder.coq.Hole;
 import proofbuilder.coq.Lambda;
+import proofbuilder.coq.NonemptyContext;
 import proofbuilder.coq.Product;
 import proofbuilder.coq.ProofTree;
 import proofbuilder.coq.Term;
+import proofbuilder.coq.Variable;
 
 public class ProofTreeView extends ProofViewComponent {
 	
@@ -90,6 +93,27 @@ public class ProofTreeView extends ProofViewComponent {
 				Term term = proofTree.term.getHoleContents();
 				if (term instanceof Hole hole) {
 					Term type = hole.getType().getHoleContents();
+					
+					Context context = proofTree.context;
+					int index = 0;
+					while (context instanceof NonemptyContext nec) {
+						if (nec.type.isAProp(nec.outerContext)) {
+							Term liftedType = nec.type.lift(0, index);
+							if (liftedType.unifiesWith(proofBuilderPanel.holesContext, type)) {
+								JMenuItem item = new JMenuItem(new TeXFormula(nec.name).createTeXIcon(TeXConstants.STYLE_DISPLAY, LATEX_POINT_SIZE));
+								int itemIndex = index;
+								item.addActionListener((ActionEvent e) -> {
+									hole.checkEquals(new Variable(itemIndex));
+									proofBuilderPanel.termChanged();
+								});
+								menu.add(item);
+								show = true;
+							}
+						}
+						context = nec.outerContext;
+						index++;
+					}
+					
 					if (type != null && type instanceof Product product) {
 						if (product.boundVariable == null) {
 							JMenuItem item = new JMenuItem(new TeXFormula("\\Rightarrow_I").createTeXIcon(TeXConstants.STYLE_DISPLAY, LATEX_POINT_SIZE));
@@ -100,7 +124,7 @@ public class ProofTreeView extends ProofViewComponent {
 							menu.add(item);
 							show = true;
 						}
-					} 
+					}
 					
 					{
 						JMenuItem item = new JMenuItem(new TeXFormula("\\Rightarrow_E").createTeXIcon(TeXConstants.STYLE_DISPLAY, LATEX_POINT_SIZE));

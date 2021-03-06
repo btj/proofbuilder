@@ -40,8 +40,7 @@ public class Application extends Term {
 		this.uncurriedArguments = uncurriedArguments;
 	}
 	
-	public void checkEquals(Term other) {
-		other = other.getHoleContents();
+	public void checkEqualsCore(Term other) {
 		if (other instanceof Application app) {
 			function.checkEquals(app.function);
 			argument.checkEquals(app.argument);

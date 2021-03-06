@@ -6,7 +6,7 @@ public abstract class Sort extends Term {
 
 	public Term with(Term term, int index) { return this; }
 	
-	public void checkEquals(Term other) {
+	public void checkEqualsCore(Term other) {
 		if (this != other)
 			throw typeMismatchError(other, this);
 	}
