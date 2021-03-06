@@ -12,10 +12,10 @@ public class ProofBuilderPanel extends JPanel {
 	
 	static final int MARGIN = 20;
 
-	ProofView proofView;
+	ProofTreeView proofView;
 	
 	ProofBuilderPanel(ProofTree proofTree) {
-		proofView = new ProofView(proofTree);
+		proofView = new ProofTreeView(this, proofTree);
 		proofView.computeLayout();
 		setBackground(Color.white);
 	}
@@ -29,7 +29,7 @@ public class ProofBuilderPanel extends JPanel {
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		g.translate(MARGIN, MARGIN);
-		proofView.paint(this, g);
+		proofView.paint(g);
 	}
 	
 }
