@@ -8,6 +8,10 @@ public class Product extends Term {
 	public final Term domain;
 	public final Term range;
 	
+	public String toString() {
+		return boundVariable == null ? "(" + domain + " -> " + range + ")" : "(forall " + boundVariable + ": " + domain + ", " + range + ")";
+	}
+	
 	public Product(String boundVariable, Term domain, Term range) {
 		this.boundVariable = boundVariable;
 		this.domain = domain;
@@ -72,8 +76,7 @@ public class Product extends Term {
 			rangeTree = range.check(context);
 		else
 			rangeTree = range.check(Context.cons(context, boundVariable, domain));
-		if (!(rangeTree.actualType instanceof Sort))
-			throw typeError("Range of product must be a type");
+		rangeTree.actualType.checkIsSort();
 		
 		Term type;
 		if (domainTree.actualType instanceof PropSort) {

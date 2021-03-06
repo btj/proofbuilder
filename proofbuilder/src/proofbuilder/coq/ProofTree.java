@@ -77,8 +77,12 @@ public class ProofTree {
 		else if (term instanceof Application)
 			if (uncurriedFunction != null && uncurriedNbArgs == uncurriedFunction.nbArguments)
 				return uncurriedFunction.getRuleAsLaTeX(context);
-			else
-				return ((Product)children.get(0).getType()).boundVariable == null ? "\\Rightarrow_E" : "\\forall_E";
+			else {
+				Term functionType = children.get(0).getType().getHoleContents();
+				if (!(functionType instanceof Product))
+					throw new AssertionError();
+				return ((Product)functionType).boundVariable == null ? "\\Rightarrow_E" : "\\forall_E";
+			}
 		else if (term instanceof Constant constant) {
 			return constant.getRuleAsLaTeX(context);
 		} else if (term instanceof Hole hole) {

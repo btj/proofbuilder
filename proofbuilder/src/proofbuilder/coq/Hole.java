@@ -9,8 +9,18 @@ public class Hole extends AbstractHole {
 	public final int id;
 	private Context context;
 	private Term type;
+	private boolean mustBeSort;
 	private Term contents;
 	private ProofTree[] childProofTrees = new ProofTree[1];
+	
+	@Override
+	public HolesContext getHolesContext() {
+		return holesContext;
+	}
+	
+	public String toString() {
+		return "hole(" + id + ", " + contents + (contents == null ? ", " + type : "") + ")";
+	}
 	
 	public Term getType() {
 		return type;
@@ -50,6 +60,13 @@ public class Hole extends AbstractHole {
 		return new ProofTree(context, this, type, type, Arrays.asList(childProofTrees));
 	}
 	
+	@Override
+	public void checkIsSort() {
+		if (contents != null)
+			contents.checkIsSort();
+		mustBeSort = true;
+	}
+	
 	public Term getHoleContents() {
 		if (contents != null)
 			return contents;
@@ -58,8 +75,10 @@ public class Hole extends AbstractHole {
 	
 	@Override
 	public void checkEqualsCore(Term other) {
-		if (contents != null)
+		if (contents != null) {
 			contents.checkEquals(other);
+			return;
+		}
 		if (other == this)
 			return;
 		if (context == null) throw new AssertionError();
@@ -71,6 +90,8 @@ public class Hole extends AbstractHole {
 			childProofTrees[0] = other.checkAgainst(context, type);
 		} else
 			childProofTrees[0] = other.check(context);
+		if (mustBeSort)
+			other.checkIsSort();
 		contents = other;
 	}
 	

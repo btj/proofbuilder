@@ -6,6 +6,8 @@ public class Variable extends Term {
 	
 	public final int deBruijnIndex;
 	
+	public String toString() { return "#" + deBruijnIndex; }
+	
 	public Variable(int deBruijnIndex) {
 		this.deBruijnIndex = deBruijnIndex;
 	}

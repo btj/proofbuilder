@@ -6,6 +6,10 @@ public class TypeSort extends Sort {
 
 	public final int level;
 	
+	public String toString() {
+		return "Type(" + level + ")";
+	}
+	
 	TypeSort(int level) {
 		this.level = level;
 	}

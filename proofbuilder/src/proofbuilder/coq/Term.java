@@ -64,10 +64,13 @@ public abstract class Term {
 		return check(context).actualType instanceof PropSort;
 	}
 	
+	public void checkIsSort() {
+		throw typeError("Sort expected");
+	}
+	
 	public void checkIsType() {
-		Term type = check(Context.empty).actualType;
-		if (!(type instanceof Sort))
-			throw typeError("Type expected");
+		check(Context.empty).actualType.checkIsSort();
+		
 	}
 	
 	public RuntimeException typeMismatchError(Term expectedType, Term actualType) {
@@ -126,5 +129,5 @@ public abstract class Term {
 		}
 		return false;
 	}
-
+	
 }

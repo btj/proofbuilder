@@ -59,19 +59,19 @@ public class ProofBuilderPanel extends JPanel {
 		proofView.computeLayout();
 		proofView.x = MARGIN;
 		proofView.y = MARGIN;
-		holesContext.push();
 		revalidate();
 		repaint();
 	}
 	
-	void termChanged() {
+	void changeTerm(Runnable body) {
+		holesContext.push();
+		body.run();
 		refreshProofTreeView();
 		nbChanges++;
 	}
 	
 	void undo() {
 		if (nbChanges > 0) {
-			holesContext.pop();
 			holesContext.pop();
 			refreshProofTreeView();
 			nbChanges--;

@@ -10,5 +10,7 @@ public abstract class Sort extends Term {
 		if (this != other)
 			throw typeMismatchError(other, this);
 	}
+	
+	public void checkIsSort() {}
 
 }

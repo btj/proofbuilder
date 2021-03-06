@@ -10,6 +10,10 @@ public class Constant extends Term {
 	public final Term type;
 	public final int nbArguments;
 	
+	public String toString() {
+		return name;
+	}
+	
 	public Constant(String name, Term type, String ruleLaTeX, int nbArguments) {
 		this.name = name;
 		this.type = type;

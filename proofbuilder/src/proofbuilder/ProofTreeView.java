@@ -105,8 +105,9 @@ public class ProofTreeView extends ProofViewComponent {
 								JMenuItem item = new JMenuItem(new TeXFormula(nec.name).createTeXIcon(TeXConstants.STYLE_DISPLAY, LATEX_POINT_SIZE));
 								int itemIndex = index;
 								item.addActionListener((ActionEvent e) -> {
-									hole.checkEquals(new Variable(itemIndex));
-									proofBuilderPanel.termChanged();
+									proofBuilderPanel.changeTerm(() -> {
+										hole.checkEquals(new Variable(itemIndex));
+									});
 								});
 								menu.add(item);
 								show = true;
@@ -121,14 +122,29 @@ public class ProofTreeView extends ProofViewComponent {
 							{
 								JMenuItem item = new JMenuItem(new TeXFormula("\\Rightarrow_I").createTeXIcon(TeXConstants.STYLE_DISPLAY, LATEX_POINT_SIZE));
 								item.addActionListener((ActionEvent e) -> {
-									hole.checkEquals(new Lambda("u", product.domain, proofBuilderPanel.holesContext.createHole()));
-									proofBuilderPanel.termChanged();
+									proofBuilderPanel.changeTerm(() -> {
+										hole.checkEquals(new Lambda("u", product.domain, proofBuilderPanel.holesContext.createHole()));
+									});
 								});
 								menu.add(item);
 								show = true;
 							}
 							
 							// Forward reasoning
+							if (product.domain.getHoleContents() instanceof Product domainProduct) {
+								JMenuItem item = new JMenuItem(new TeXFormula("\\textrm{forward with }\\forall_E").createTeXIcon(TeXConstants.STYLE_DISPLAY, LATEX_POINT_SIZE));
+								item.addActionListener((ActionEvent e) -> {
+									proofBuilderPanel.changeTerm(() -> {
+										Hole functionHole = proofBuilderPanel.holesContext.createHole();
+										//functionHole.checkAgainst(Context.cons(proofTree.context, "u", product.domain), new Product(null, ))
+										Hole argumentHole = proofBuilderPanel.holesContext.createHole();
+										hole.checkEquals(new Lambda("u", product.domain, new Application(functionHole, new Application(new Variable(0), argumentHole))));
+									});
+								});
+								menu.add(item);
+								show = true;
+							}
+							
 							for (Constant constant : proofBuilderPanel.constants.values()) {
 								ArrayList<Integer> matchingParameters = new ArrayList<>();
 								boolean use;
@@ -155,31 +171,32 @@ public class ProofTreeView extends ProofViewComponent {
 									for (int matchingParameter : matchingParameters) {
 										JMenuItem item = new JMenuItem(new TeXFormula("\\textrm{forward with }" + constant.getRuleAsLaTeX(Context.empty)).createTeXIcon(TeXConstants.STYLE_DISPLAY, LATEX_POINT_SIZE));
 										item.addActionListener((ActionEvent e) -> {
-											Term constantApplication = constant;
-											
-											int parameterIndex = 0;
-											Term constantType = constant.type;
-											while (constantType instanceof Product productType) {
-												Term argument;
-												if (parameterIndex == matchingParameter) {
-													argument = new Variable(0);
-												} else {
-													argument = proofBuilderPanel.holesContext.createHole();
+											proofBuilderPanel.changeTerm(() -> {
+												Term constantApplication = constant;
+												
+												int parameterIndex = 0;
+												Term constantType = constant.type;
+												while (constantType instanceof Product productType) {
+													Term argument;
+													if (parameterIndex == matchingParameter) {
+														argument = new Variable(0);
+													} else {
+														argument = proofBuilderPanel.holesContext.createHole();
+													}
+													constantApplication = new Application(constantApplication, argument);
+													if (productType.boundVariable != null) {
+														constantType = productType.range.getHoleContents().with(argument, 0);
+													} else
+														constantType = productType.range.getHoleContents();
+													parameterIndex++;
 												}
-												constantApplication = new Application(constantApplication, argument);
-												if (productType.boundVariable != null) {
-													constantType = productType.range.getHoleContents().with(argument, 0);
-												} else
-													constantType = productType.range.getHoleContents();
-												parameterIndex++;
-											}
-											
-											Term functionHole = proofBuilderPanel.holesContext.createHole();
-											functionHole.checkAgainst(Context.cons(proofTree.context, "u", product.domain), new Product(null, constantType, product.range));
-											
-											Term lambdaBody = new Application(functionHole, constantApplication);
-											hole.checkEquals(new Lambda("u", product.domain, lambdaBody));
-											proofBuilderPanel.termChanged();
+												
+												Term functionHole = proofBuilderPanel.holesContext.createHole();
+												functionHole.checkAgainst(Context.cons(proofTree.context, "u", product.domain), new Product(null, constantType, product.range));
+												
+												Term lambdaBody = new Application(functionHole, constantApplication);
+												hole.checkEquals(new Lambda("u", product.domain, lambdaBody));
+											});
 										});
 										menu.add(item);
 										show = true;
@@ -192,14 +209,15 @@ public class ProofTreeView extends ProofViewComponent {
 					{
 						JMenuItem item = new JMenuItem(new TeXFormula("\\Rightarrow_E").createTeXIcon(TeXConstants.STYLE_DISPLAY, LATEX_POINT_SIZE));
 						item.addActionListener((ActionEvent e) -> {
-							Hole antecedentHole = proofBuilderPanel.holesContext.createHole();
-							antecedentHole.checkAgainst(proofTree.context, Term.prop);
-							Hole functionHole = proofBuilderPanel.holesContext.createHole();
-							functionHole.checkAgainst(proofTree.context, new Product(null, antecedentHole, type));
-							Hole argumentHole = proofBuilderPanel.holesContext.createHole();
-							argumentHole.checkAgainst(proofTree.context, antecedentHole);
-							hole.checkEquals(new Application(functionHole, argumentHole));
-							proofBuilderPanel.termChanged();
+							proofBuilderPanel.changeTerm(() -> {
+								Hole antecedentHole = proofBuilderPanel.holesContext.createHole();
+								antecedentHole.checkAgainst(proofTree.context, Term.prop);
+								Hole functionHole = proofBuilderPanel.holesContext.createHole();
+								functionHole.checkAgainst(proofTree.context, new Product(null, antecedentHole, type));
+								Hole argumentHole = proofBuilderPanel.holesContext.createHole();
+								argumentHole.checkAgainst(proofTree.context, antecedentHole);
+								hole.checkEquals(new Application(functionHole, argumentHole));
+							});
 						});
 						menu.add(item);
 						show = true;

@@ -11,6 +11,10 @@ public class Application extends Term {
 	public final int uncurriedNbArguments;
 	public final List<Term> uncurriedArguments;
 	
+	public String toString() {
+		return "(" + function + " " + argument + ")";
+	}
+	
 	public Application(Term function, Term argument) {
 		this.function = function;
 		this.argument = argument;
@@ -66,9 +70,16 @@ public class Application extends Term {
 	
 	public ProofTree check(Context context) {
 		ProofTree functionTree = function.check(context);
-		if (functionTree.actualType instanceof Product prod) {
+		Term functionType = functionTree.actualType.getHoleContents();
+		if (functionType instanceof Product prod) {
 			ProofTree argumentTree = argument.checkAgainst(context, prod.domain);
 			return new ProofTree(context, this, prod.range(argument), null, List.of(functionTree, argumentTree));
+		} else if (functionType instanceof AbstractHole functionTypeHole) {
+			ProofTree argumentTree = argument.check(context);
+			Hole rangeHole = functionTypeHole.getHolesContext().createHole();
+			rangeHole.check(context);
+			functionType.checkEquals(new Product(null, argumentTree.actualType, rangeHole));
+			return new ProofTree(context, this, rangeHole, null, List.of(functionTree, argumentTree));
 		} else
 			throw typeError("Trying to apply a term that is not a function");
 	}

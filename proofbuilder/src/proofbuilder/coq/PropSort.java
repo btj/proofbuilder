@@ -6,6 +6,8 @@ public class PropSort extends Sort {
 	
 	PropSort() {}
 	
+	public String toString() { return "Prop"; }
+	
 	public ProofTree check(Context context) {
 		return new ProofTree(context, this, Term.type(1), null, List.of());
 	}

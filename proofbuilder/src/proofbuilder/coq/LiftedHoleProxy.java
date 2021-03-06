@@ -4,17 +4,30 @@ import java.util.Arrays;
 
 public class LiftedHoleProxy extends AbstractHole {
 	
-	public final Term hole;
+	public final AbstractHole hole;
 	public final int startIndex;
 	public final int nbBindings;
 	private ProofTree[] childProofTrees = new ProofTree[1];
 	
-	public LiftedHoleProxy(Term hole, int startIndex, int nbBindings) {
+	@Override
+	public HolesContext getHolesContext() {
+		return hole.getHolesContext();
+	}
+	public String toString() {
+		return "lift(" + hole + ", " + startIndex + ", " + nbBindings + ")";
+	}
+	
+	public LiftedHoleProxy(AbstractHole hole, int startIndex, int nbBindings) {
 		if (nbBindings < 0)
 			throw new AssertionError();
 		this.hole = hole;
 		this.startIndex = startIndex;
 		this.nbBindings = nbBindings;
+	}
+	
+	@Override
+	public void checkIsSort() {
+		hole.checkIsSort();
 	}
 	
 	@Override
@@ -46,8 +59,11 @@ public class LiftedHoleProxy extends AbstractHole {
 
 	@Override
 	public Term with(Term term, int index) {
-		if (startIndex <= index && index < startIndex + nbBindings)
-			return this;
+		if (startIndex <= index && index < startIndex + nbBindings) {
+			if (startIndex == 0 && nbBindings == 1)
+				return hole;
+			return new LiftedHoleProxy(hole, startIndex, nbBindings - 1);
+		}
 		throw new RuntimeException("Not yet implemented");
 	}
 	

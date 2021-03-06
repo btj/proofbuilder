@@ -8,6 +8,10 @@ public class Lambda extends Term {
 	public final Term domain;
 	public final Term body;
 	
+	public String toString() {
+		return "(fun " + boundVariable + ": " + domain + " => " + body + ")";
+	}
+	
 	public Lambda(String boundVariable, Term domain, Term body) {
 		this.boundVariable = boundVariable;
 		this.domain = domain;
