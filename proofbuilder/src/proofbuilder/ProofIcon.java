@@ -8,8 +8,8 @@ public class ProofIcon extends ProofViewComponent {
 	
 	Icon icon;
 	
-	ProofIcon(ProofBuilderPanel proofBuilderPanel, Icon icon, int x, int y) {
-		super(proofBuilderPanel);
+	ProofIcon(ProofBuilderPanel proofBuilderPanel, ProofViewComponent parent, Icon icon, int x, int y) {
+		super(proofBuilderPanel, parent);
 		this.icon = icon;
 		this.x = x;
 		this.y = y;

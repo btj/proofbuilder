@@ -1,15 +1,18 @@
 package proofbuilder;
 
-import java.awt.Component;
 import java.awt.Graphics;
+import java.awt.Point;
+import java.awt.event.MouseEvent;
 import java.util.Arrays;
+
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 
 import org.scilab.forge.jlatexmath.TeXConstants;
 import org.scilab.forge.jlatexmath.TeXFormula;
 import org.scilab.forge.jlatexmath.TeXIcon;
 
 import proofbuilder.coq.ProofTree;
-import proofbuilder.coq.Sort;
 
 public class ProofTreeView extends ProofViewComponent {
 	
@@ -30,12 +33,12 @@ public class ProofTreeView extends ProofViewComponent {
 	int ruleCenter;
 	int ruleY;
 	
-	ProofTreeView(ProofBuilderPanel proofBuilderPanel, ProofTree proofTree) {
-		super(proofBuilderPanel);
+	ProofTreeView(ProofBuilderPanel proofBuilderPanel, ProofViewComponent parent, ProofTree proofTree) {
+		super(proofBuilderPanel, parent);
 		this.proofTree = proofTree;
 		this.typeIcon = new TeXFormula(proofTree.getType().toLaTeX(proofTree.context, 0)).createTeXIcon(TeXConstants.STYLE_DISPLAY, LATEX_POINT_SIZE);
 		this.ruleIcon = new TeXFormula(proofTree.getRuleAsLaTeX()).createTeXIcon(TeXConstants.STYLE_DISPLAY, LATEX_POINT_SIZE);
-		children = proofTree.uncurriedChildren.stream().filter(tree -> tree.actualType.isAProp(tree.context)).map(tree -> new ProofTreeView(proofBuilderPanel, tree)).toArray(n -> new ProofTreeView[n]);
+		children = proofTree.uncurriedChildren.stream().filter(tree -> tree.actualType.isAProp(tree.context)).map(tree -> new ProofTreeView(proofBuilderPanel, this, tree)).toArray(n -> new ProofTreeView[n]);
 		childComponents.addAll(Arrays.asList(children));
 	}
 	
@@ -70,8 +73,16 @@ public class ProofTreeView extends ProofViewComponent {
 			childX += child.width + CHILDREN_SPACING;
 		}
 		
-		childComponents.add(new ProofIcon(proofBuilderPanel, typeIcon, ruleCenter - typeIcon.getIconWidth() / 2, ruleY + RULE_HEIGHT + RULE_SPACING));
-		childComponents.add(new ProofIcon(proofBuilderPanel, ruleIcon, ruleCenter + ruleWidth / 2 + RULE_ICON_SPACING, ruleY + RULE_HEIGHT / 2 - ruleIcon.getIconHeight() / 2));
+		childComponents.add(new ProofIcon(proofBuilderPanel, this, typeIcon, ruleCenter - typeIcon.getIconWidth() / 2, ruleY + RULE_HEIGHT + RULE_SPACING));
+		childComponents.add(new ProofIcon(proofBuilderPanel, this, ruleIcon, ruleCenter + ruleWidth / 2 + RULE_ICON_SPACING, ruleY + RULE_HEIGHT / 2 - ruleIcon.getIconHeight() / 2) {
+			@Override
+			void handleMouseEvent(MouseEvent event) {
+				JPopupMenu menu = new JPopupMenu();
+				menu.add(new JMenuItem("FooBar"));
+				Point eventCoords = toPanelCoordinates(event.getX(), event.getY());
+				menu.show(proofBuilderPanel, eventCoords.x, eventCoords.y);
+			}
+		});
 	}
 	
 	void paintComponent(Graphics g) {

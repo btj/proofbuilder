@@ -3,6 +3,8 @@ package proofbuilder;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.JPanel;
 
@@ -15,9 +17,18 @@ public class ProofBuilderPanel extends JPanel {
 	ProofTreeView proofView;
 	
 	ProofBuilderPanel(ProofTree proofTree) {
-		proofView = new ProofTreeView(this, proofTree);
+		proofView = new ProofTreeView(this, null, proofTree);
 		proofView.computeLayout();
+		proofView.x = MARGIN;
+		proofView.y = MARGIN;
 		setBackground(Color.white);
+		
+		addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				proofView.handleParentMouseEvent(e);
+			}
+		});
 	}
 	
 	@Override
