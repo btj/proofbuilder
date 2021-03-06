@@ -117,7 +117,6 @@ public abstract class Term {
 			this.checkEquals(other);
 			return true;
 		} catch (TypeException e) {
-			e.printStackTrace();
 		} finally {
 			holesContext.pop();
 		}

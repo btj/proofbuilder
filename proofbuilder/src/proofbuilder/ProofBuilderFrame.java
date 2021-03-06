@@ -1,8 +1,12 @@
 package proofbuilder;
 
+import java.awt.Color;
 import java.awt.EventQueue;
 
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import proofbuilder.coq.HolesContext;
@@ -16,7 +20,13 @@ public class ProofBuilderFrame extends JFrame {
 		super("Proof Builder");
 		
 		proofBuilderPanel = new ProofBuilderPanel(holesContext, proofTree);
-		getContentPane().add(new JScrollPane(proofBuilderPanel));
+		JPanel scrollPaneContentsPanel = new JPanel();
+		BoxLayout boxLayout = new BoxLayout(scrollPaneContentsPanel, BoxLayout.Y_AXIS);
+		scrollPaneContentsPanel.setLayout(boxLayout);
+		scrollPaneContentsPanel.add(Box.createVerticalGlue());
+		scrollPaneContentsPanel.add(proofBuilderPanel);
+		scrollPaneContentsPanel.setBackground(Color.white);
+		getContentPane().add(new JScrollPane(scrollPaneContentsPanel));
 		pack();
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

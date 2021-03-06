@@ -80,6 +80,11 @@ public class ProofBuilderPanel extends JPanel {
 	}
 	
 	@Override
+	public Dimension getMaximumSize() {
+		return getPreferredSize();
+	}
+	
+	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		g.translate(MARGIN, MARGIN);
