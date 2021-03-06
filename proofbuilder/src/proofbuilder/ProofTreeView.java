@@ -4,6 +4,7 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import javax.swing.JMenuItem;
@@ -14,6 +15,7 @@ import org.scilab.forge.jlatexmath.TeXFormula;
 import org.scilab.forge.jlatexmath.TeXIcon;
 
 import proofbuilder.coq.Application;
+import proofbuilder.coq.Constant;
 import proofbuilder.coq.Context;
 import proofbuilder.coq.Hole;
 import proofbuilder.coq.Lambda;
@@ -116,13 +118,74 @@ public class ProofTreeView extends ProofViewComponent {
 					
 					if (type != null && type instanceof Product product) {
 						if (product.boundVariable == null) {
-							JMenuItem item = new JMenuItem(new TeXFormula("\\Rightarrow_I").createTeXIcon(TeXConstants.STYLE_DISPLAY, LATEX_POINT_SIZE));
-							item.addActionListener((ActionEvent e) -> {
-								hole.checkEquals(new Lambda("u", product.domain, proofBuilderPanel.holesContext.createHole()));
-								proofBuilderPanel.termChanged();
-							});
-							menu.add(item);
-							show = true;
+							{
+								JMenuItem item = new JMenuItem(new TeXFormula("\\Rightarrow_I").createTeXIcon(TeXConstants.STYLE_DISPLAY, LATEX_POINT_SIZE));
+								item.addActionListener((ActionEvent e) -> {
+									hole.checkEquals(new Lambda("u", product.domain, proofBuilderPanel.holesContext.createHole()));
+									proofBuilderPanel.termChanged();
+								});
+								menu.add(item);
+								show = true;
+							}
+							
+							// Forward reasoning
+							for (Constant constant : proofBuilderPanel.constants.values()) {
+								ArrayList<Integer> matchingParameters = new ArrayList<>();
+								boolean use;
+								{
+									int parameterIndex = 0;
+									Term constantType = constant.type;
+									proofBuilderPanel.holesContext.push();
+									while (constantType instanceof Product productType) {
+										if (productType.domain.unifiesWith(proofBuilderPanel.holesContext, product.domain)) {
+											matchingParameters.add(parameterIndex);
+										}
+										if (productType.boundVariable != null) {
+											Hole placeholderArgument = proofBuilderPanel.holesContext.createHole();
+											placeholderArgument.checkAgainst(Context.empty, productType.domain);
+											constantType = productType.range.getHoleContents().with(placeholderArgument, 0);
+										} else
+											constantType = productType.range.getHoleContents();
+										parameterIndex++;
+									}
+									use = constantType.isAProp(Context.empty);
+									proofBuilderPanel.holesContext.pop();
+								}
+								if (use && matchingParameters.size() > 0) {
+									for (int matchingParameter : matchingParameters) {
+										JMenuItem item = new JMenuItem(new TeXFormula("\\textrm{forward with }" + constant.getRuleAsLaTeX(Context.empty)).createTeXIcon(TeXConstants.STYLE_DISPLAY, LATEX_POINT_SIZE));
+										item.addActionListener((ActionEvent e) -> {
+											Term constantApplication = constant;
+											
+											int parameterIndex = 0;
+											Term constantType = constant.type;
+											while (constantType instanceof Product productType) {
+												Term argument;
+												if (parameterIndex == matchingParameter) {
+													argument = new Variable(0);
+												} else {
+													argument = proofBuilderPanel.holesContext.createHole();
+												}
+												constantApplication = new Application(constantApplication, argument);
+												if (productType.boundVariable != null) {
+													constantType = productType.range.getHoleContents().with(argument, 0);
+												} else
+													constantType = productType.range.getHoleContents();
+												parameterIndex++;
+											}
+											
+											Term functionHole = proofBuilderPanel.holesContext.createHole();
+											functionHole.checkAgainst(Context.cons(proofTree.context, "u", product.domain), new Product(null, constantType, product.range));
+											
+											Term lambdaBody = new Application(functionHole, constantApplication);
+											hole.checkEquals(new Lambda("u", product.domain, lambdaBody));
+											proofBuilderPanel.termChanged();
+										});
+										menu.add(item);
+										show = true;
+									}
+								}
+							}
 						}
 					}
 					

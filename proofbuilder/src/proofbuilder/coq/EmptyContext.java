@@ -8,4 +8,8 @@ public class EmptyContext extends Context {
 	
 	public String getVariableName(int index) { throw new RuntimeException("Unbound variable"); }
 	
+	@Override
+	public Context unlift(int startIndex, int nbBindings) {
+		return this;
+	}
 }

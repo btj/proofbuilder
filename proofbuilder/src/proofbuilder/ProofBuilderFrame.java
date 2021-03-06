@@ -3,6 +3,7 @@ package proofbuilder;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.util.Map;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -10,6 +11,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import proofbuilder.coq.Constant;
 import proofbuilder.coq.HolesContext;
 import proofbuilder.coq.ProofTree;
 
@@ -17,10 +19,10 @@ public class ProofBuilderFrame extends JFrame {
 	
 	ProofBuilderPanel proofBuilderPanel;
 	
-	public ProofBuilderFrame(HolesContext holesContext, ProofTree proofTree) {
+	public ProofBuilderFrame(Map<String, Constant> constants, HolesContext holesContext, ProofTree proofTree) {
 		super("Proof Builder");
 		
-		proofBuilderPanel = new ProofBuilderPanel(holesContext, proofTree);
+		proofBuilderPanel = new ProofBuilderPanel(constants, holesContext, proofTree);
 		JPanel scrollPaneContentsPanel = new JPanel();
 		BoxLayout boxLayout = new BoxLayout(scrollPaneContentsPanel, BoxLayout.Y_AXIS);
 		scrollPaneContentsPanel.setLayout(boxLayout);
@@ -35,9 +37,9 @@ public class ProofBuilderFrame extends JFrame {
 		setVisible(true);
 	}
 	
-	public static void showFrame(HolesContext holesContext, ProofTree proofTree) {
+	public static void showFrame(Map<String, Constant> constants, HolesContext holesContext, ProofTree proofTree) {
 		EventQueue.invokeLater(() -> {
-			new ProofBuilderFrame(holesContext, proofTree);
+			new ProofBuilderFrame(constants, holesContext, proofTree);
 		});
 	}
 

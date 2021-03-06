@@ -19,6 +19,8 @@ public class Variable extends Term {
 	public Term lift(int startIndex, int nbBindings) {
 		if (deBruijnIndex < startIndex)
 			return this;
+		if (deBruijnIndex + nbBindings < 0)
+			throw typeError("Trying to unify a term with a hole that uses variables that are not in scope at the hole.");
 		return new Variable(deBruijnIndex + nbBindings);
 	}
 	

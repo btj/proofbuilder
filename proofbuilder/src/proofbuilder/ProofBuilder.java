@@ -60,7 +60,7 @@ public class ProofBuilder {
 		Term socratesProof = parse("?");
 		ProofTree proofTree = socratesProof.checkAgainst(Context.empty, parseType("and (forall x: object, mens x -> sterfelijk x) (mens Socrates) -> sterfelijk Socrates"));
 		
-		ProofBuilderFrame.showFrame(holesContext, proofTree);
+		ProofBuilderFrame.showFrame(constants, holesContext, proofTree);
 	}
 
 }

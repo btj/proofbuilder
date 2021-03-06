@@ -7,9 +7,11 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Map;
 
 import javax.swing.JPanel;
 
+import proofbuilder.coq.Constant;
 import proofbuilder.coq.HolesContext;
 import proofbuilder.coq.ProofTree;
 
@@ -17,12 +19,14 @@ public class ProofBuilderPanel extends JPanel {
 	
 	static final int MARGIN = 20;
 
+	Map<String, Constant> constants;
 	HolesContext holesContext;
 	ProofTree proofTree;
 	ProofTreeView proofView;
 	int nbChanges;
 	
-	ProofBuilderPanel(HolesContext holesContext, ProofTree proofTree) {
+	ProofBuilderPanel(Map<String, Constant> constants, HolesContext holesContext, ProofTree proofTree) {
+		this.constants = constants;
 		this.holesContext = holesContext;
 		setBackground(Color.white);
 		

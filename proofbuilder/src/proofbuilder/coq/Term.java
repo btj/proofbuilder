@@ -85,12 +85,16 @@ public abstract class Term {
 	public final void checkEquals(Term other) {
 		Term thisTerm = this.getHoleContents();
 		Term otherTerm = other.getHoleContents();
-		if (other instanceof Hole)
+		if (other instanceof AbstractHole)
 			other.checkEqualsCore(this);
 		else
 			checkEqualsCore(other);
 	}
 	
+	/**
+	 * @param startIndex
+	 * @param nbBindings Can be negative to unlift terms to be unified with lifted holes
+	 */
 	public abstract Term lift(int startIndex, int nbBindings);
 	
 	public abstract Term with(Term term, int index);

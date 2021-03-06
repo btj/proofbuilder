@@ -22,4 +22,14 @@ public class NonemptyContext extends Context {
 		return index == 0 ? name : outerContext.getVariableName(index - 1);
 	}
 
+	@Override
+	public Context unlift(int startIndex, int nbBindings) {
+		if (startIndex == 0) {
+			if (nbBindings > 0)
+				return outerContext.unlift(0, nbBindings - 1);
+			else
+				return this;
+		} else
+			return Context.cons(outerContext.unlift(startIndex - 1, nbBindings), name, type.lift(startIndex - 1, -nbBindings));
+	}
 }

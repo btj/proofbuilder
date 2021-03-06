@@ -10,5 +10,7 @@ public abstract class Context {
 	public abstract boolean containsName(String name);
 
 	public abstract String getVariableName(int deBruijnIndex);
+	
+	public abstract Context unlift(int startIndex, int nbBindings);
 
 }

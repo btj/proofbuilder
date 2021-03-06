@@ -3,7 +3,7 @@ package proofbuilder.coq;
 import java.util.Arrays;
 import java.util.List;
 
-public class Hole extends Term {
+public class Hole extends AbstractHole {
 	
 	public final HolesContext holesContext;
 	public final int id;
@@ -78,7 +78,9 @@ public class Hole extends Term {
 	public Term lift(int startIndex, int nbBindings) {
 		if (contents != null)
 			return contents.lift(startIndex, nbBindings);
-		throw new RuntimeException("Not yet implemented");
+		if (nbBindings == 0)
+			return this;
+		return new LiftedHoleProxy(this, startIndex, nbBindings);
 	}
 	
 	@Override
