@@ -100,5 +100,7 @@ public abstract class Term {
 	public abstract String toLaTeX(Context context, int precedence);
 	
 	public Term getHead() { return this; }
+	
+	public Term getHoleContents() { return this; }
 
 }

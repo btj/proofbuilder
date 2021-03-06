@@ -58,6 +58,7 @@ public class ProofTree {
 	}
 	
 	public String getRuleAsLaTeX() {
+		Term term = this.term.getHoleContents();
 		if (term instanceof Lambda)
 			return (((Product)getType()).boundVariable == null ? "\\Rightarrow" : "\\forall") + "_{I^" + children.get(1).context.getVariableName(0) + "}";
 		else if (term instanceof PropSort)
@@ -75,6 +76,8 @@ public class ProofTree {
 				return ((Product)children.get(0).getType()).boundVariable == null ? "\\Rightarrow_E" : "\\forall_E";
 		else if (term instanceof Constant constant) {
 			return constant.getRuleAsLaTeX(context);
+		} else if (term instanceof Hole hole) {
+			return "?_{" + hole.id + "}";
 		} else
 			throw new AssertionError();
 	}

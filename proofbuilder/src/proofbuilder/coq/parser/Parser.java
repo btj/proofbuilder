@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import proofbuilder.coq.Constant;
+import proofbuilder.coq.HolesContext;
 import proofbuilder.coq.Lambda;
 import proofbuilder.coq.Product;
 import proofbuilder.coq.Term;
@@ -13,10 +14,12 @@ public class Parser {
 	
 	Lexer lexer;
 	TokenType tokenType;
+	HolesContext holesContext;
 	Map<String, Constant> constants;
 	ArrayList<String> context = new ArrayList<>();
 	
-	Parser(Map<String, Constant> constants, String text) {
+	Parser(HolesContext holesContext, Map<String, Constant> constants, String text) {
+		this.holesContext = holesContext;
 		this.constants = constants;
 		lexer = new Lexer(text);
 		eat();
@@ -142,6 +145,10 @@ public class Parser {
 			expect(TokenType.RPAREN);
 			return result;
 		}
+		case QUES -> {
+			eat();
+			return holesContext.createHole();
+		}
 		default -> {
 			return null;
 		}
@@ -174,8 +181,8 @@ public class Parser {
 		return result;
 	}
 	
-	public static Term parseTerm(Map<String, Constant> constants, String text) {
-		Parser parser = new Parser(constants, text);
+	public static Term parseTerm(HolesContext holesContext, Map<String, Constant> constants, String text) {
+		Parser parser = new Parser(holesContext, constants, text);
 		Term result = parser.parseTerm();
 		if (parser.tokenType != TokenType.EOF)
 			throw parser.parseError("Bad token");

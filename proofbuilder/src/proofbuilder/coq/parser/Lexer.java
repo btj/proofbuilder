@@ -65,6 +65,7 @@ public class Lexer {
 		case '-': eat(); if (c != '>') throw lexerError("> expected"); eat(); return TokenType.THIN_ARROW;
 		case '(': eat(); return TokenType.LPAREN;
 		case ')': eat(); return TokenType.RPAREN;
+		case '?': eat(); return TokenType.QUES;
 		default: throw lexerError("Bad character");
 		}
 	}

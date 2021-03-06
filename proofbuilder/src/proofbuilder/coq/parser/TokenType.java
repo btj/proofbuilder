@@ -14,6 +14,7 @@ public enum TokenType {
 	LPAREN,
 	RPAREN,
 	COLON,
-	EOF
+	EOF,
+	QUES
 
 }

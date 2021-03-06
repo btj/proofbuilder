@@ -1,14 +1,12 @@
 package proofbuilder;
 
-import static proofbuilder.coq.Term.*;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import proofbuilder.coq.Application;
 import proofbuilder.coq.Constant;
 import proofbuilder.coq.Context;
+import proofbuilder.coq.HolesContext;
 import proofbuilder.coq.ProofTree;
 import proofbuilder.coq.Term;
 import proofbuilder.coq.parser.Parser;
@@ -16,9 +14,10 @@ import proofbuilder.coq.parser.Parser;
 public class ProofBuilder {
 	
 	static Map<String, Constant> constants = new HashMap<String, Constant>();
+	static HolesContext holesContext = new HolesContext();
 	
 	static Term parse(String text) {
-		return Parser.parseTerm(constants, text);
+		return Parser.parseTerm(holesContext, constants, text);
 	}
 	
 	static Term parseType(String text) {
@@ -54,10 +53,11 @@ public class ProofBuilder {
 		parameter("s", "object -> Prop");
 		parameter("S", "object");
 		
-		Term socratesProof = parse("""
-				fun u: and (forall x: object, m x -> s x) (m S) =>
-				  and_proj1 (forall x: object, m x -> s x) (m S) u S (and_proj2 (forall x: object, m x -> s x) (m S) u)
-				""");
+//		Term socratesProof = parse("""
+//				fun u: and (forall x: object, m x -> s x) (m S) =>
+//				  and_proj1 (forall x: object, m x -> s x) (m S) u S (and_proj2 (forall x: object, m x -> s x) (m S) u)
+//				""");
+		Term socratesProof = parse("?");
 		ProofTree proofTree = socratesProof.checkAgainst(Context.empty, parseType("and (forall x: object, m x -> s x) (m S) -> s S"));
 		
 		ProofBuilderFrame.showFrame(proofTree);
