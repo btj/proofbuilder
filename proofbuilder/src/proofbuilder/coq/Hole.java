@@ -9,6 +9,10 @@ public class Hole extends Term {
 	private Context context;
 	private Term type;
 	private Term contents;
+	
+	public Term getType() {
+		return type;
+	}
 
 	Hole(HolesContext holesContext, int id) {
 		this.holesContext = holesContext;

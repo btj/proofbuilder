@@ -12,7 +12,10 @@ import org.scilab.forge.jlatexmath.TeXConstants;
 import org.scilab.forge.jlatexmath.TeXFormula;
 import org.scilab.forge.jlatexmath.TeXIcon;
 
+import proofbuilder.coq.Hole;
+import proofbuilder.coq.Product;
 import proofbuilder.coq.ProofTree;
+import proofbuilder.coq.Term;
 
 public class ProofTreeView extends ProofViewComponent {
 	
@@ -78,9 +81,23 @@ public class ProofTreeView extends ProofViewComponent {
 			@Override
 			void handleMouseEvent(MouseEvent event) {
 				JPopupMenu menu = new JPopupMenu();
-				menu.add(new JMenuItem("FooBar"));
-				Point eventCoords = toPanelCoordinates(event.getX(), event.getY());
-				menu.show(proofBuilderPanel, eventCoords.x, eventCoords.y);
+				boolean show = false;
+				
+				Term term = proofTree.term.getHoleContents();
+				if (term instanceof Hole hole) {
+					Term type = hole.getType().getHoleContents();
+					if (type != null && type instanceof Product product) {
+						if (product.boundVariable == null) {
+							menu.add(new JMenuItem(new TeXFormula("\\Rightarrow_I").createTeXIcon(TeXConstants.STYLE_DISPLAY, LATEX_POINT_SIZE)));
+							show = true;
+						}
+					} 
+				}
+				
+				if (show) {
+					Point eventCoords = toPanelCoordinates(event.getX(), event.getY());
+					menu.show(proofBuilderPanel, eventCoords.x, eventCoords.y);
+				}
 			}
 		});
 	}
