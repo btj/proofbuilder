@@ -1,6 +1,7 @@
 package proofbuilder;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 
 import javax.swing.Box;
@@ -27,6 +28,7 @@ public class ProofBuilderFrame extends JFrame {
 		scrollPaneContentsPanel.add(proofBuilderPanel);
 		scrollPaneContentsPanel.setBackground(Color.white);
 		getContentPane().add(new JScrollPane(scrollPaneContentsPanel));
+		setPreferredSize(new Dimension(800, 600));
 		pack();
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
