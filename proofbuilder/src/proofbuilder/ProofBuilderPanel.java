@@ -3,6 +3,8 @@ package proofbuilder;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -16,7 +18,9 @@ public class ProofBuilderPanel extends JPanel {
 	static final int MARGIN = 20;
 
 	HolesContext holesContext;
+	ProofTree proofTree;
 	ProofTreeView proofView;
+	int nbChanges;
 	
 	ProofBuilderPanel(HolesContext holesContext, ProofTree proofTree) {
 		this.holesContext = holesContext;
@@ -29,20 +33,45 @@ public class ProofBuilderPanel extends JPanel {
 			}
 		});
 		
-		setProofTree(proofTree);
+		addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyTyped(KeyEvent e) {
+				if (e.getKeyChar() == 26)
+					undo();
+			}
+		});
+		
+		this.proofTree = proofTree;
+		refreshProofTreeView();
 	}
 	
-	void setProofTree(ProofTree proofTree) {
+	@Override
+	public boolean isFocusable() {
+		return true;
+	}
+	
+	void refreshProofTreeView() {
 		proofView = new ProofTreeView(this, null, proofTree);
 		proofView.computeLayout();
 		proofView.x = MARGIN;
 		proofView.y = MARGIN;
+		holesContext.push();
 		revalidate();
 		repaint();
 	}
 	
 	void termChanged() {
-		setProofTree(proofView.proofTree.refresh());
+		refreshProofTreeView();
+		nbChanges++;
+	}
+	
+	void undo() {
+		if (nbChanges > 0) {
+			holesContext.pop();
+			holesContext.pop();
+			refreshProofTreeView();
+			nbChanges--;
+		}
 	}
 	
 	@Override
