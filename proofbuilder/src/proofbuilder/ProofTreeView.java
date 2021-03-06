@@ -69,11 +69,12 @@ public class ProofTreeView extends ProofViewComponent {
 			child.y = childrenHeight - child.height;
 			childX += child.width + CHILDREN_SPACING;
 		}
+		
+		childComponents.add(new ProofIcon(proofBuilderPanel, typeIcon, ruleCenter - typeIcon.getIconWidth() / 2, ruleY + RULE_HEIGHT + RULE_SPACING));
+		childComponents.add(new ProofIcon(proofBuilderPanel, ruleIcon, ruleCenter + ruleWidth / 2 + RULE_ICON_SPACING, ruleY + RULE_HEIGHT / 2 - ruleIcon.getIconHeight() / 2));
 	}
 	
 	void paintComponent(Graphics g) {
 		g.drawLine(ruleCenter - ruleWidth / 2, ruleY, ruleCenter + ruleWidth / 2, ruleY);
-		typeIcon.paintIcon(proofBuilderPanel, g, ruleCenter - typeIcon.getIconWidth() / 2, ruleY + RULE_HEIGHT + RULE_SPACING);
-		ruleIcon.paintIcon(proofBuilderPanel, g, ruleCenter + ruleWidth / 2 + RULE_ICON_SPACING, ruleY + RULE_HEIGHT / 2 - ruleIcon.getIconHeight() / 2);
 	}
 }
