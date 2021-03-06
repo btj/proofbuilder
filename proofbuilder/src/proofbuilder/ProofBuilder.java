@@ -49,16 +49,16 @@ public class ProofBuilder {
 		rule("and_proj2", "forall (P: Prop) (Q: Prop), and P Q -> Q", "\\land_{E^2}", 3);
 		
 		parameter("object", "Type");
-		parameter("m", "object -> Prop");
-		parameter("s", "object -> Prop");
-		parameter("S", "object");
+		parameter("mens", "object -> Prop");
+		parameter("sterfelijk", "object -> Prop");
+		parameter("Socrates", "object");
 		
 //		Term socratesProof = parse("""
 //				fun u: and (forall x: object, m x -> s x) (m S) =>
 //				  and_proj1 (forall x: object, m x -> s x) (m S) u S (and_proj2 (forall x: object, m x -> s x) (m S) u)
 //				""");
 		Term socratesProof = parse("?");
-		ProofTree proofTree = socratesProof.checkAgainst(Context.empty, parseType("and (forall x: object, m x -> s x) (m S) -> s S"));
+		ProofTree proofTree = socratesProof.checkAgainst(Context.empty, parseType("and (forall x: object, mens x -> sterfelijk x) (mens Socrates) -> sterfelijk Socrates"));
 		
 		ProofBuilderFrame.showFrame(proofTree);
 	}
