@@ -16,7 +16,7 @@ public class ProofView {
 	static final int RULE_ICON_SPACING = 3;
 	static final int RULE_SPACING = 2;
 	static final int RULE_HEIGHT = 1;
-	static final int LATEX_POINT_SIZE = 20;
+	static final int LATEX_POINT_SIZE = 40;
 
 	ProofTree proofTree;
 	TeXIcon typeIcon;

@@ -10,6 +10,8 @@ import java.util.Set;
 
 public abstract class Term {
 	
+	public static boolean showDomains = false;
+	
 	public Constant getUncurriedFunction() { return null; }
 	public int getUncurriedNbArguments() { throw new IllegalStateException(); }
 	public List<Term> getUncurriedArguments() { throw new IllegalStateException(); }

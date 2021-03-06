@@ -94,7 +94,7 @@ public class Product extends Term {
 		if (boundVariable == null)
 			return parenthesize(precedence, PREC_IMPL, domain.toLaTeX(context, PREC_IMPL + 1) + " \\Rightarrow " + range.toLaTeX(context, PREC_IMPL));
 		else
-			return parenthesize(precedence, 0, "\\forall " + boundVariable + ": " + domain.toLaTeX(context, 0) + ".\\; " +
+			return parenthesize(precedence, 0, "\\forall " + boundVariable + (showDomains ? ": " + domain.toLaTeX(context, 0) : "") + ".\\; " +
 					range.toLaTeX(Context.cons(context, boundVariable, domain), 0));
 	}
 	
