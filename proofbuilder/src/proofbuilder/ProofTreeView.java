@@ -132,7 +132,8 @@ public class ProofTreeView extends ProofViewComponent {
 							
 							// Forward reasoning
 							if (product.domain.getHoleContents() instanceof Product domainProduct) {
-								JMenuItem item = new JMenuItem(new TeXFormula("\\textrm{forward with }\\forall_E").createTeXIcon(TeXConstants.STYLE_DISPLAY, LATEX_POINT_SIZE));
+								String ruleName = domainProduct.boundVariable == null ? "\\Rightarrow_E" : "\\forall_E";
+								JMenuItem item = new JMenuItem(new TeXFormula("\\textrm{forward with }" + ruleName).createTeXIcon(TeXConstants.STYLE_DISPLAY, LATEX_POINT_SIZE));
 								item.addActionListener((ActionEvent e) -> {
 									proofBuilderPanel.changeTerm(() -> {
 										Hole functionHole = proofBuilderPanel.holesContext.createHole();
