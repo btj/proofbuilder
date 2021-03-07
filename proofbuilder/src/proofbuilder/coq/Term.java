@@ -111,7 +111,7 @@ public abstract class Term {
 	public static final int PREC_EXP_CONJ = 590;
 	public static final int PREC_EXP_DISJ = 588;
 	public static final int PREC_EXP_IMPL = 580;
-	public static final int PREC_ASSIGN = 550;
+	public static final int PREC_STMT = 550;
 	
 	public static final int PREC_BIMPLIES = 400;
 	

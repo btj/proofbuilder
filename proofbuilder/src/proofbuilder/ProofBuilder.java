@@ -66,14 +66,16 @@ public class ProofBuilder {
 		parameter("i", "aexp", "\\texttt{i}");
 		parameter("0", "aexp", "\\texttt{0}");
 		parameter("bexp", "Type");
+		parameter("btrue", "bexp", "\\texttt{True}");
+		parameter("bfalse", "bexp", "\\texttt{False}");
 		infixOperator("beq", "aexp -> aexp -> bexp", "\\;\\texttt{==}\\;", Term.PREC_EXP_EQ, Term.PREC_EXP_EQ + 1, Term.PREC_EXP_EQ + 1);
 		parameter("stmt", "Type");
-		infixOperator("gets", "aexp -> aexp -> stmt", "\\;\\texttt{=}\\;", Term.PREC_ASSIGN, Term.PREC_ASSIGN + 1, Term.PREC_ASSIGN + 1);
+		infixOperator("gets", "aexp -> aexp -> stmt", "\\;\\texttt{=}\\;", Term.PREC_STMT, Term.PREC_STMT + 1, Term.PREC_STMT + 1);
 		constants.put("correct", new Constant("correct", parseType("bexp -> stmt -> bexp -> Prop"), "\\mathsf{correct}", 3) {
 			@Override
 			public String toLaTeX(Context context, List<Term> arguments, int precedence) {
 				return """
-						\\begin{array}{l}
+						\\begin{array}{@{} l @{}}
 						\\textcolor{blue}{\\{%s\\}}\\\\
 						%s\\\\
 						\\textcolor{blue}{\\{%s\\}}
@@ -88,10 +90,30 @@ public class ProofBuilder {
 		infixOperator("bimplies", "bexp -> bexp -> Prop", "\\Rightarrow_\\texttt{exp}", Term.PREC_BIMPLIES, Term.PREC_BIMPLIES + 1, Term.PREC_BIMPLIES);
 		rule("assign", "forall (P: bexp) (Q: bexp) (E: aexp) (x: aexp), bimplies P (bsubst Q E x) -> correct P (gets x E) Q", "\\texttt{=}", 5);
 
-		Term minimalCorrectProof = parse("assign ? ? ? ? ?");
+//		Term minimalCorrectProof = parse("assign ? ? ? ? ?");
 //		Term minimalCorrectProof = parse("?");
-		Term minimalCorrectGoal = parse("correct (beq 0 0) (gets i 0) (beq i 0)");
-		ProofTree proofTree = minimalCorrectProof.checkAgainst(Context.empty, minimalCorrectGoal);
+//		Term minimalCorrectGoal = parse("correct btrue (gets i 0) (beq i 0)");
+//		ProofTree proofTree = minimalCorrectProof.checkAgainst(Context.empty, minimalCorrectGoal);
+		
+		constants.put("seq", new Constant("seq", parseType("stmt -> stmt -> stmt"), "\\mathsf{seq}", 2) {
+			@Override
+			public String toLaTeX(Context context, List<Term> arguments, int precedence) {
+				return """
+						\\begin{array}{@{} l @{}}
+						%s\\\\
+						%s
+						\\end{array}
+						""".formatted(
+								arguments.get(0).toLaTeX(context, PREC_STMT),
+								arguments.get(1).toLaTeX(context, PREC_STMT));
+			}
+		});
+		
+		parameter("som", "aexp", "\\texttt{som}");
+		infixOperator("band", "bexp -> bexp -> bexp", "\\;\\texttt{and}\\;", Term.PREC_EXP_CONJ, Term.PREC_EXP_CONJ + 1, Term.PREC_EXP_CONJ);
+		Term seqProof = parse("?");
+		Term seqGoal = parse("correct btrue (seq (gets i 0) (gets som 0)) (band (beq i 0) (beq som 0))");
+		ProofTree proofTree = seqProof.checkAgainst(Context.empty, seqGoal);		
 		
 //		Term socratesProof = parse("""
 //				fun u: and (forall x: object, m x -> s x) (m S) =>
