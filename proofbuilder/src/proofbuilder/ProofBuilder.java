@@ -66,7 +66,7 @@ public class ProofBuilder {
 		parameter("i", "aexp", "\\texttt{i}");
 		parameter("0", "aexp", "\\texttt{0}");
 		parameter("bexp", "Type");
-		infixOperator("beq", "aexp -> aexp -> bexp", "\\;\\texttt{==}\\;", Term.PREC_EQ, Term.PREC_EQ + 1, Term.PREC_EQ + 1);
+		infixOperator("beq", "aexp -> aexp -> bexp", "\\;\\texttt{==}\\;", Term.PREC_EXP_EQ, Term.PREC_EXP_EQ + 1, Term.PREC_EXP_EQ + 1);
 		parameter("stmt", "Type");
 		infixOperator("gets", "aexp -> aexp -> stmt", "\\;\\texttt{=}\\;", Term.PREC_ASSIGN, Term.PREC_ASSIGN + 1, Term.PREC_ASSIGN + 1);
 		constants.put("correct", new Constant("correct", parseType("bexp -> stmt -> bexp -> Prop"), "\\mathsf{correct}", 3) {
@@ -84,9 +84,14 @@ public class ProofBuilder {
 								arguments.get(2).toLaTeX(context, 0));
 			}
 		});
+		parameter("bsubst", "bexp -> aexp -> aexp -> bexp");
+		infixOperator("bimplies", "bexp -> bexp -> Prop", "\\Rightarrow_\\texttt{exp}", Term.PREC_BIMPLIES, Term.PREC_BIMPLIES + 1, Term.PREC_BIMPLIES);
+		rule("assign", "forall (P: bexp) (Q: bexp) (E: aexp) (x: aexp), bimplies P (bsubst Q E x) -> correct P (gets x E) Q", "\\texttt{=}", 5);
 
+		Term minimalCorrectProof = parse("assign ? ? ? ? ?");
+//		Term minimalCorrectProof = parse("?");
 		Term minimalCorrectGoal = parse("correct (beq 0 0) (gets i 0) (beq i 0)");
-		ProofTree proofTree = parse("?").checkAgainst(Context.empty, minimalCorrectGoal);
+		ProofTree proofTree = minimalCorrectProof.checkAgainst(Context.empty, minimalCorrectGoal);
 		
 //		Term socratesProof = parse("""
 //				fun u: and (forall x: object, m x -> s x) (m S) =>

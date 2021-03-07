@@ -102,7 +102,19 @@ public abstract class Term {
 	
 	public abstract Term with(Term term, int index);
 	
-	public static final int PREC_FUNC = 100;
+	public static final int PREC_FUNC = 1000;
+	public static final int PREC_EXP_POW = 598;
+	public static final int PREC_EXP_TIMES = 596;
+	public static final int PREC_EXP_PLUS = 594;
+	public static final int PREC_EXP_EQ = 592;
+	public static final int PREC_EXP_NOT = 591;
+	public static final int PREC_EXP_CONJ = 590;
+	public static final int PREC_EXP_DISJ = 588;
+	public static final int PREC_EXP_IMPL = 580;
+	public static final int PREC_ASSIGN = 550;
+	
+	public static final int PREC_BIMPLIES = 400;
+	
 	public static final int PREC_POW = 98;
 	public static final int PREC_TIMES = 96;
 	public static final int PREC_PLUS = 94;
@@ -111,7 +123,6 @@ public abstract class Term {
 	public static final int PREC_CONJ = 90;
 	public static final int PREC_DISJ = 88;
 	public static final int PREC_IMPL = 80;
-	public static final int PREC_ASSIGN = 50;
 	
 	public static String parenthesize(int targetPrecedence, int actualPrecedence, String text) {
 		if (targetPrecedence > actualPrecedence)
