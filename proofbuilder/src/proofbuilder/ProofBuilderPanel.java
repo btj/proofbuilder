@@ -15,7 +15,7 @@ import proofbuilder.coq.Constant;
 import proofbuilder.coq.HolesContext;
 import proofbuilder.coq.ProofTree;
 
-public abstract class ProofBuilderPanel extends JPanel {
+public class ProofBuilderPanel extends JPanel {
 	
 	static final int MARGIN = 20;
 
@@ -27,9 +27,9 @@ public abstract class ProofBuilderPanel extends JPanel {
 	int latexPointSize = 20;
 	int zoomExponent = 0;
 	
-	ProofBuilderPanel(Map<String, Constant> constants, HolesContext holesContext, ProofTree proofTree) {
-		this.constants = constants;
-		this.holesContext = holesContext;
+	ProofBuilderPanel(NamedProofTree namedProofTree) {
+		this.constants = namedProofTree.constants;
+		this.holesContext = namedProofTree.holesContext;
 		setBackground(Color.white);
 		
 		addMouseListener(new MouseAdapter() {
@@ -39,25 +39,8 @@ public abstract class ProofBuilderPanel extends JPanel {
 			}
 		});
 		
-		addKeyListener(new KeyAdapter() {
-			@Override
-			public void keyTyped(KeyEvent e) {
-				if (e.getKeyChar() == 26) // Ctrl+Z
-					undo();
-				if (e.getKeyChar() == 6) // Ctrl+F
-					showFillHoleDialog();
-			}
-		});
-		
-		this.proofTree = proofTree;
+		this.proofTree = namedProofTree.proofTree;
 		refreshProofTreeView();
-	}
-	
-	abstract void showFillHoleDialog();
-	
-	@Override
-	public boolean isFocusable() {
-		return true;
 	}
 	
 	void refreshProofTreeView() {

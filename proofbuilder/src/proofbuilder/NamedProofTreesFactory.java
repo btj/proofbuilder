@@ -13,27 +13,27 @@ import proofbuilder.coq.ProofTree;
 import proofbuilder.coq.Term;
 import proofbuilder.coq.parser.Parser;
 
-public class ProofBuilder {
+public class NamedProofTreesFactory {
 	
-	static Map<String, Constant> constants = new HashMap<String, Constant>();
-	static HolesContext holesContext = new HolesContext();
-	static Map<String, Constant> pythonConstants;
+	Map<String, Constant> constants = new HashMap<String, Constant>();
+	HolesContext holesContext = new HolesContext();
+	Map<String, Constant> pythonConstants;
 	
-	static Term parse(String text) {
+	Term parse(String text) {
 		return Parser.parseTerm(holesContext, constants, text);
 	}
 	
-	static Term parseType(String text) {
+	Term parseType(String text) {
 		Term result = parse(text);
 		result.checkIsType();
 		return result;
 	}
 	
-	static void parameter(String name, String type) {
+	void parameter(String name, String type) {
 		constants.put(name, new Constant(name, parseType(type)));
 	}
 	
-	static void parameter(String name, String type, String laTeX) {
+	void parameter(String name, String type, String laTeX) {
 		constants.put(name, new Constant(name, parseType(type)) {
 			@Override
 			public String toLaTeX(Context context, int precedence) {
@@ -42,7 +42,7 @@ public class ProofBuilder {
 		});
 	}
 	
-	static void infixOperator(String name, String type, String operatorLaTeX, int precedence, int leftPrec, int rightPrec) {
+	void infixOperator(String name, String type, String operatorLaTeX, int precedence, int leftPrec, int rightPrec) {
 		constants.put(name, new Constant(name, parseType(type), operatorLaTeX, 2) {
 			@Override
 			public String toLaTeX(Context context, List<Term> arguments, int targetPrecedence) {
@@ -51,11 +51,11 @@ public class ProofBuilder {
 		});
 	}
 	
-	static void rule(String name, String type, String laTeX, int nbArgs) {
+	void rule(String name, String type, String laTeX, int nbArgs) {
 		constants.put(name, new Constant(name, parseType(type), laTeX, nbArgs));
 	}
 	
-	public static void main(String[] args) {
+	public NamedProofTree createNamedProofTree() {
 		infixOperator("and", "Prop -> Prop -> Prop", "\\land", Term.PREC_CONJ, Term.PREC_CONJ + 1, Term.PREC_CONJ);
 		rule("and_proj1", "forall (P: Prop) (Q: Prop), and P Q -> P", "\\land_{E^1}", 3);
 		rule("and_proj2", "forall (P: Prop) (Q: Prop), and P Q -> Q", "\\land_{E^2}", 3);
@@ -186,7 +186,7 @@ public class ProofBuilder {
 				Map.entry("#LE", constants.get("ble")),
 				Map.entry("#AND", constants.get("band"))
 		);
-		ProofBuilderFrame.showFrame(constants, holesContext, proofTree);
+		return new NamedProofTree("som == sum(range(n))", constants, holesContext, pythonConstants, proofTree);
 	}
 
 }

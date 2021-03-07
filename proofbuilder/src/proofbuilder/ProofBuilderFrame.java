@@ -36,12 +36,15 @@ import proofbuilder.coq.TypeException;
 
 public class ProofBuilderFrame extends JFrame {
 	
+	NamedProofTree namedProofTree;
 	ProofBuilderPanel proofBuilderPanel;
 	
-	public ProofBuilderFrame(Map<String, Constant> constants, HolesContext holesContext, ProofTree proofTree) {
+	public ProofBuilderFrame(NamedProofTree namedProofTree) {
 		super("Proof Builder");
 		
-		proofBuilderPanel = new ProofBuilderPanel(constants, holesContext, proofTree) {
+		this.namedProofTree = namedProofTree;
+		
+		proofBuilderPanel = new ProofBuilderPanel(namedProofTree) {
 			@Override
 			public void refreshProofTreeView() {
 				super.refreshProofTreeView();
@@ -49,11 +52,6 @@ public class ProofBuilderFrame extends JFrame {
 				setTitle("Proof Builder - " + (nbUnfilledHoles == 1 ? "1 hole" : nbUnfilledHoles + " holes"));
 				if (holesContext.getNbUnfilledHoles() == 0)
 					JOptionPane.showMessageDialog(ProofBuilderFrame.this, "Proof complete!");
-			}
-			
-			@Override
-			void showFillHoleDialog() {
-				ProofBuilderFrame.this.showFillHoleDialog();
 			}
 		};
 		JPanel scrollPaneContentsPanel = new JPanel();
@@ -70,6 +68,7 @@ public class ProofBuilderFrame extends JFrame {
 		JMenuBar menuBar = new JMenuBar();
 		JMenu editMenu = new JMenu("Edit");
 		JMenuItem undoMenuItem = new JMenuItem("Undo");
+		undoMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, ActionEvent.CTRL_MASK));
 		undoMenuItem.addActionListener((ActionEvent e) -> proofBuilderPanel.undo());
 		editMenu.add(undoMenuItem);
 		menuBar.add(editMenu);
@@ -85,6 +84,7 @@ public class ProofBuilderFrame extends JFrame {
 		menuBar.add(viewMenu);
 		JMenu proofMenu = new JMenu("Proof");
 		JMenuItem fillHoleMenuItem = new JMenuItem("Fill Hole");
+		fillHoleMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, ActionEvent.CTRL_MASK));
 		fillHoleMenuItem.addActionListener(e -> {
 			showFillHoleDialog();
 		});
@@ -101,7 +101,7 @@ public class ProofBuilderFrame extends JFrame {
 	
 	void showFillHoleDialog() {
 		ArrayList<Integer> unfilledHoleIds = new ArrayList<>();
-		List<Hole> holes = ProofBuilder.holesContext.getHoles();
+		List<Hole> holes = namedProofTree.holesContext.getHoles();
 		for (Hole hole : holes) {
 			if (!hole.isFilled())
 				unfilledHoleIds.add(hole.id);
@@ -118,13 +118,13 @@ public class ProofBuilderFrame extends JFrame {
 		JButton okButton = new JButton("OK");
 		okButton.addActionListener((ActionEvent e) -> {
 			try {
-				Term term = proofbuilder.pythonparser.Parser.parseExpression(ProofBuilder.pythonConstants, contentsField.getText());
+				Term term = proofbuilder.pythonparser.Parser.parseExpression(namedProofTree.pythonConstants, contentsField.getText());
 				Hole hole = holes.get(unfilledHoleIds.get(holeComboBox.getSelectedIndex()) - 1); 
 				try {
 					proofBuilderPanel.changeTerm(() -> hole.checkEquals(term));
 					dialog.dispose();
 				} catch (TypeException ex) {
-					ProofBuilder.holesContext.pop(); // Undo the push performed by changeTerm
+					namedProofTree.holesContext.pop(); // Undo the push performed by changeTerm
 					JOptionPane.showMessageDialog(dialog, "Type error: " + ex.getMessage(), "Fill Hole: Type Error", JOptionPane.ERROR_MESSAGE);
 				}
 			} catch (proofbuilder.pythonparser.ParserException ex) {
@@ -161,10 +161,14 @@ public class ProofBuilderFrame extends JFrame {
 		dialog.setVisible(true);
 	}
 	
-	public static void showFrame(Map<String, Constant> constants, HolesContext holesContext, ProofTree proofTree) {
+	public static void showFrame(NamedProofTree namedProofTree) {
 		EventQueue.invokeLater(() -> {
-			new ProofBuilderFrame(constants, holesContext, proofTree);
+			new ProofBuilderFrame(namedProofTree);
 		});
+	}
+	
+	public static void main(String[] args) {
+		showFrame(new NamedProofTreesFactory().createNamedProofTree());
 	}
 
 }
