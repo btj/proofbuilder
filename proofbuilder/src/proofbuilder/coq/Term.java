@@ -102,6 +102,7 @@ public abstract class Term {
 	
 	public abstract Term with(Term term, int index);
 	
+	public static final int PREC_POSTFIX = 2000;
 	public static final int PREC_FUNC = 1000;
 	public static final int PREC_EXP_POW = 598;
 	public static final int PREC_EXP_TIMES = 596;

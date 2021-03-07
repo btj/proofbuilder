@@ -86,7 +86,15 @@ public class ProofBuilder {
 								arguments.get(2).toLaTeX(context, 0));
 			}
 		});
-		parameter("bsubst", "bexp -> aexp -> aexp -> bexp");
+		constants.put("bsubst", new Constant("bsubst", parseType("bexp -> aexp -> aexp -> bexp"), "\\mathsf{bsubst}", 3) {
+			@Override
+			public String toLaTeX(Context context, List<Term> arguments, int precedence) {
+				return
+						arguments.get(0).toLaTeX(context, PREC_POSTFIX) + "[" +
+						arguments.get(1).toLaTeX(context, 0) + "/" +
+						arguments.get(2).toLaTeX(context, 0) + "]";
+			}
+		});
 		infixOperator("bimplies", "bexp -> bexp -> Prop", "\\Rightarrow_\\texttt{exp}", Term.PREC_BIMPLIES, Term.PREC_BIMPLIES + 1, Term.PREC_BIMPLIES);
 		rule("Cassign", "forall (P: bexp) (Q: bexp) (E: aexp) (x: aexp), bimplies P (bsubst Q E x) -> correct P (gets x E) Q", "\\texttt{=}", 5);
 
