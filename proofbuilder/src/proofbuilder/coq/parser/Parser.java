@@ -34,7 +34,7 @@ public class Parser {
 	}
 	
 	String expectIdent() {
-		if (tokenType != TokenType.IDENT)
+		if (tokenType != TokenType.IDENT && tokenType != TokenType.NATURAL)
 			throw parseError("Identifier expected");
 		String result = lexer.tokenValue;
 		eat();
@@ -83,7 +83,7 @@ public class Parser {
 	
 	Term tryParsePrimaryTerm() {
 		switch (tokenType) {
-		case IDENT -> {
+		case IDENT, NATURAL -> {
 			int index = context.lastIndexOf(lexer.tokenValue);
 			if (0 <= index) {
 				eat();

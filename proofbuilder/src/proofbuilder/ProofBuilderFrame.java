@@ -27,7 +27,8 @@ public class ProofBuilderFrame extends JFrame {
 			@Override
 			public void refreshProofTreeView() {
 				super.refreshProofTreeView();
-				setTitle("Proof Builder - " + holesContext.getNbUnfilledHoles() + " unfilled holes");
+				int nbUnfilledHoles = holesContext.getNbUnfilledHoles();
+				setTitle("Proof Builder - " + (nbUnfilledHoles == 1 ? "1 hole" : nbUnfilledHoles + " holes"));
 				if (holesContext.getNbUnfilledHoles() == 0)
 					JOptionPane.showMessageDialog(ProofBuilderFrame.this, "Proof complete!");
 			}

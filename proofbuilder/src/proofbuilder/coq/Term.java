@@ -103,8 +103,15 @@ public abstract class Term {
 	public abstract Term with(Term term, int index);
 	
 	public static final int PREC_FUNC = 100;
+	public static final int PREC_POW = 98;
+	public static final int PREC_TIMES = 96;
+	public static final int PREC_PLUS = 94;
+	public static final int PREC_EQ = 92;
+	public static final int PREC_NOT = 91;
 	public static final int PREC_CONJ = 90;
+	public static final int PREC_DISJ = 88;
 	public static final int PREC_IMPL = 80;
+	public static final int PREC_ASSIGN = 50;
 	
 	public static String parenthesize(int targetPrecedence, int actualPrecedence, String text) {
 		if (targetPrecedence > actualPrecedence)
