@@ -88,9 +88,9 @@ public class ProofBuilder {
 		});
 		parameter("bsubst", "bexp -> aexp -> aexp -> bexp");
 		infixOperator("bimplies", "bexp -> bexp -> Prop", "\\Rightarrow_\\texttt{exp}", Term.PREC_BIMPLIES, Term.PREC_BIMPLIES + 1, Term.PREC_BIMPLIES);
-		rule("assign", "forall (P: bexp) (Q: bexp) (E: aexp) (x: aexp), bimplies P (bsubst Q E x) -> correct P (gets x E) Q", "\\texttt{=}", 5);
+		rule("Cassign", "forall (P: bexp) (Q: bexp) (E: aexp) (x: aexp), bimplies P (bsubst Q E x) -> correct P (gets x E) Q", "\\texttt{=}", 5);
 
-//		Term minimalCorrectProof = parse("assign ? ? ? ? ?");
+//		Term minimalCorrectProof = parse("Cassign ? ? ? ? ?");
 //		Term minimalCorrectProof = parse("?");
 //		Term minimalCorrectGoal = parse("correct btrue (gets i 0) (beq i 0)");
 //		ProofTree proofTree = minimalCorrectProof.checkAgainst(Context.empty, minimalCorrectGoal);
@@ -111,9 +111,11 @@ public class ProofBuilder {
 		
 		parameter("som", "aexp", "\\texttt{som}");
 		infixOperator("band", "bexp -> bexp -> bexp", "\\;\\texttt{and}\\;", Term.PREC_EXP_CONJ, Term.PREC_EXP_CONJ + 1, Term.PREC_EXP_CONJ);
-		Term seqProof = parse("?");
+		rule("Cseq", "forall (P Q R: bexp) (p1 p2: stmt), correct P p1 R -> correct R p2 Q -> correct P (seq p1 p2) Q", "\\textrm{\\textsc{Seq}}", 7);
+//		Term seqProof = parse("?");
+		Term seqProof = parse("Cseq ? ? ? ? ? ? ?");
 		Term seqGoal = parse("correct btrue (seq (gets i 0) (gets som 0)) (band (beq i 0) (beq som 0))");
-		ProofTree proofTree = seqProof.checkAgainst(Context.empty, seqGoal);		
+		ProofTree proofTree = seqProof.checkAgainst(Context.empty, seqGoal);
 		
 //		Term socratesProof = parse("""
 //				fun u: and (forall x: object, m x -> s x) (m S) =>

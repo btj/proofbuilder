@@ -48,20 +48,33 @@ public class Parser {
 	}
 	
 	Term parseProducts() {
+		boolean parenthesized = false;
 		if (tokenType == TokenType.LPAREN) {
 			eat();
-			String boundVariable = expectIdent();
-			expect(TokenType.COLON);
-			Term domain = parseTerm();
-			expect(TokenType.RPAREN);
-			context.add(boundVariable);
-			Term range = parseProducts();
-			context.remove(context.size() - 1);
-			return new Product(boundVariable, domain, range);
-		} else {
-			expect(TokenType.COMMA);
+			parenthesized = true;
+		} else if (tokenType == TokenType.COMMA) {
+			eat();
 			return parseTerm();
 		}
+		ArrayList<String> boundVariables = new ArrayList<>();
+		do {
+			String boundVariable = expectIdent();
+			boundVariables.add(boundVariable);
+		} while (tokenType == TokenType.IDENT);
+		Term domain = null;
+		if (tokenType == TokenType.COLON) {
+			eat();
+			domain = parseTerm();
+		}
+		
+		if (parenthesized == true)
+			expect(TokenType.RPAREN);
+		context.addAll(boundVariables);
+		Term result = parseProducts();
+		context.subList(context.size() - boundVariables.size(), context.size()).clear();
+		for (int i = boundVariables.size() - 1; 0 <= i; i--)
+			result = new Product(boundVariables.get(i), domain == null ? holesContext.createHole() : domain, result);
+		return result;
 	}
 	
 	Term parseLambdas() {
