@@ -39,7 +39,10 @@ public class ProofBuilderFrame extends JFrame {
 		scrollPaneContentsPanel.add(Box.createVerticalGlue());
 		scrollPaneContentsPanel.add(proofBuilderPanel);
 		scrollPaneContentsPanel.setBackground(Color.white);
-		getContentPane().add(new JScrollPane(scrollPaneContentsPanel));
+		JScrollPane scrollPane = new JScrollPane(scrollPaneContentsPanel);
+		scrollPane.getHorizontalScrollBar().setUnitIncrement(10);
+		scrollPane.getVerticalScrollBar().setUnitIncrement(10);
+		getContentPane().add(scrollPane);
 		setPreferredSize(new Dimension(800, 600));
 		pack();
 		setLocationRelativeTo(null);
