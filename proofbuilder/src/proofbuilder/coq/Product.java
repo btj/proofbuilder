@@ -83,7 +83,7 @@ public class Product extends Term {
 		if (domainType instanceof PropSort) {
 			type = rangeType;
 		} else if (rangeType instanceof PropSort) {
-			type = domainType;
+			type = rangeType;
 		} else {
 			if (((TypeSort)domainType).level > ((TypeSort)rangeType).level)
 				type = domainType;

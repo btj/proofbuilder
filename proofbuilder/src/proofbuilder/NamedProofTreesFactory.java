@@ -1,10 +1,9 @@
 package proofbuilder;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.swing.JDialog;
 
 import proofbuilder.coq.Constant;
 import proofbuilder.coq.Context;
@@ -55,15 +54,38 @@ public class NamedProofTreesFactory {
 		constants.put(name, new Constant(name, parseType(type), laTeX, nbArgs));
 	}
 	
-	public NamedProofTree createNamedProofTree() {
+	public List<NamedProofTree> createNamedProofTrees() {
+		ArrayList<NamedProofTree> result = new ArrayList<>();
+		
 		infixOperator("and", "Prop -> Prop -> Prop", "\\land", Term.PREC_CONJ, Term.PREC_CONJ + 1, Term.PREC_CONJ);
 		rule("and_proj1", "forall (P: Prop) (Q: Prop), and P Q -> P", "\\land_{E^1}", 3);
 		rule("and_proj2", "forall (P: Prop) (Q: Prop), and P Q -> Q", "\\land_{E^2}", 3);
 		
-//		parameter("object", "Type");
-//		parameter("mens", "object -> Prop");
-//		parameter("sterfelijk", "object -> Prop");
-//		parameter("Socrates", "object");
+		parameter("object", "Type");
+		parameter("mens", "object -> Prop");
+		parameter("sterfelijk", "object -> Prop");
+		parameter("Socrates", "object");
+		
+		{
+			assert holesContext.getNbUnfilledHoles() == 0;
+			holesContext = new HolesContext();
+			Term socratesProof = parse("?");
+			ProofTree proofTree = socratesProof.checkAgainst(Context.empty, parseType("and (forall x: object, mens x -> sterfelijk x) (mens Socrates) -> sterfelijk Socrates"));
+			result.add(new NamedProofTree("Socrates", constants, holesContext, Map.of(), proofTree));
+			holesContext = new HolesContext();
+		}
+		
+		{
+			assert holesContext.getNbUnfilledHoles() == 0;
+			holesContext = new HolesContext();
+			Term socratesProof = parse("""
+				fun u: and (forall x: object, mens x -> sterfelijk x) (mens Socrates) =>
+				  and_proj1 (forall x: object, mens x -> sterfelijk x) (mens Socrates) u Socrates (and_proj2 (forall x: object, mens x -> sterfelijk x) (mens Socrates) u)
+				""");
+			ProofTree proofTree = socratesProof.checkAgainst(Context.empty, parseType("and (forall x: object, mens x -> sterfelijk x) (mens Socrates) -> sterfelijk Socrates"));
+			result.add(new NamedProofTree("Socrates (bewijs)", constants, holesContext, Map.of(), proofTree));
+			holesContext = new HolesContext();
+		}
 		
 		parameter("aexp", "Type");
 		parameter("i", "aexp", "\\texttt{i}");
@@ -101,10 +123,15 @@ public class NamedProofTreesFactory {
 		infixOperator("bimplies", "bexp -> bexp -> Prop", "\\Rightarrow_\\texttt{exp}", Term.PREC_BIMPLIES, Term.PREC_BIMPLIES + 1, Term.PREC_BIMPLIES);
 		rule("Cassign", "forall (P: bexp) (Q: bexp) (E: aexp) (x: aexp), bimplies P (bsubst Q E x) -> correct P (gets x E) Q", "\\texttt{=}", 5);
 
-//		Term minimalCorrectProof = parse("Cassign ? ? ? ? ?");
-//		Term minimalCorrectProof = parse("?");
-//		Term minimalCorrectGoal = parse("correct btrue (gets i 0) (beq i 0)");
-//		ProofTree proofTree = minimalCorrectProof.checkAgainst(Context.empty, minimalCorrectGoal);
+		{
+			assert holesContext.getNbUnfilledHoles() == 0;
+			holesContext = new HolesContext();
+			Term minimalCorrectProof = parse("?");
+			Term minimalCorrectGoal = parse("correct btrue (gets i 0) (beq i 0)");
+			ProofTree proofTree = minimalCorrectProof.checkAgainst(Context.empty, minimalCorrectGoal);
+			result.add(new NamedProofTree("i == 0", constants, holesContext, Map.of(), proofTree));
+			holesContext = new HolesContext();
+		}
 		
 		constants.put("seq", new Constant("seq", parseType("stmt -> stmt -> stmt"), "\\mathsf{seq}", 2) {
 			@Override
@@ -124,10 +151,15 @@ public class NamedProofTreesFactory {
 		parameter("som", "aexp", "\\texttt{som}");
 		infixOperator("band", "bexp -> bexp -> bexp", "\\;\\texttt{and}\\;", Term.PREC_EXP_CONJ, Term.PREC_EXP_CONJ + 1, Term.PREC_EXP_CONJ);
 		rule("Cseq", "forall (P Q R: bexp) (p1 p2: stmt), correct P p1 R -> correct R p2 Q -> correct P (seq p1 p2) Q", "\\textrm{\\textsc{Seq}}", 7);
-//		Term seqProof = parse("?");
-//		Term seqProof = parse("Cseq ? ? ? ? ? ? ?");
-//		Term seqGoal = parse("correct btrue (seq (gets i 0) (gets som 0)) (band (beq i 0) (beq som 0))");
-//		ProofTree proofTree = seqProof.checkAgainst(Context.empty, seqGoal);
+		{
+			assert holesContext.getNbUnfilledHoles() == 0;
+			holesContext = new HolesContext();
+			Term seqProof = parse("?");
+			Term seqGoal = parse("correct btrue (seq (gets i 0) (gets som 0)) (band (beq i 0) (beq som 0))");
+			ProofTree proofTree = seqProof.checkAgainst(Context.empty, seqGoal);
+			result.add(new NamedProofTree("i == 0 and som == 0", constants, holesContext, Map.of(), proofTree));
+			holesContext = new HolesContext();
+		}
 		
 		constants.put("while", new Constant("while", parseType("bexp -> stmt -> stmt"), "\\texttt{while}", 2) {
 			@Override
@@ -159,34 +191,34 @@ public class NamedProofTreesFactory {
 		rule("Cconseq", "forall P1 P2 Q1 Q2 p, (bimplies P1 P2) -> correct P2 p Q1 -> (bimplies Q1 Q2) -> correct P1 p Q2", "\\textrm{\\textsc{Conseq}}", 8);
 		rule("Cwhile", "forall I E p, correct (band I E) p I -> correct I (while E p) (band I (bnot E))", "\\texttt{while}", 4);
 		
-		Term whileProof = parse("?");
-		Term whileGoal = parse("""
-				correct
-					(band (ble 0 n) (band (beq i 0) (beq som 0)))
-					(while (bneq i n) (seq (gets som (aplus som i)) (gets i (aplus i 1))))
-					(beq som (asum (range n)))
-				""");
-		ProofTree proofTree = whileProof.checkAgainst(Context.empty, whileGoal);
+		{
+			assert holesContext.getNbUnfilledHoles() == 0;
+			holesContext = new HolesContext();
+			Term whileProof = parse("?");
+			Term whileGoal = parse("""
+					correct
+						(band (ble 0 n) (band (beq i 0) (beq som 0)))
+						(while (bneq i n) (seq (gets som (aplus som i)) (gets i (aplus i 1))))
+						(beq som (asum (range n)))
+					""");
+			ProofTree proofTree = whileProof.checkAgainst(Context.empty, whileGoal);
+			
+			pythonConstants = Map.ofEntries(
+					Map.entry("0", constants.get("0")),
+					Map.entry("i", constants.get("i")),
+					Map.entry("n", constants.get("n")),
+					Map.entry("som", constants.get("som")),
+					Map.entry("sum", constants.get("asum")),
+					Map.entry("range", constants.get("range")),
+					Map.entry("#EQ", constants.get("beq")),
+					Map.entry("#LE", constants.get("ble")),
+					Map.entry("#AND", constants.get("band"))
+			);
+			result.add(new NamedProofTree("som == sum(range(n))", constants, holesContext, pythonConstants, proofTree));
+			holesContext = new HolesContext();
+		}
 		
-//		Term socratesProof = parse("""
-//				fun u: and (forall x: object, m x -> s x) (m S) =>
-//				  and_proj1 (forall x: object, m x -> s x) (m S) u S (and_proj2 (forall x: object, m x -> s x) (m S) u)
-//				""");
-//		Term socratesProof = parse("?");
-//		ProofTree proofTree = socratesProof.checkAgainst(Context.empty, parseType("and (forall x: object, mens x -> sterfelijk x) (mens Socrates) -> sterfelijk Socrates"));
-		
-		pythonConstants = Map.ofEntries(
-				Map.entry("0", constants.get("0")),
-				Map.entry("i", constants.get("i")),
-				Map.entry("n", constants.get("n")),
-				Map.entry("som", constants.get("som")),
-				Map.entry("sum", constants.get("asum")),
-				Map.entry("range", constants.get("range")),
-				Map.entry("#EQ", constants.get("beq")),
-				Map.entry("#LE", constants.get("ble")),
-				Map.entry("#AND", constants.get("band"))
-		);
-		return new NamedProofTree("som == sum(range(n))", constants, holesContext, pythonConstants, proofTree);
+		return List.copyOf(result);
 	}
 
 }

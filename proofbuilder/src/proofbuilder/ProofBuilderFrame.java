@@ -1,5 +1,6 @@
 package proofbuilder;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
@@ -36,13 +37,21 @@ import proofbuilder.coq.TypeException;
 
 public class ProofBuilderFrame extends JFrame {
 	
+	List<NamedProofTree> namedProofTrees;
 	NamedProofTree namedProofTree;
 	ProofBuilderPanel proofBuilderPanel;
 	
-	public ProofBuilderFrame(NamedProofTree namedProofTree) {
+	void setNamedProofTree(NamedProofTree namedProofTree) {
+		this.namedProofTree = namedProofTree;
+		proofBuilderPanel.setNamedProofTree(namedProofTree);
+	}
+	
+	public ProofBuilderFrame(List<NamedProofTree> namedProofTrees) {
 		super("Proof Builder");
 		
-		this.namedProofTree = namedProofTree;
+		this.namedProofTrees = namedProofTrees;
+		int initiallySelectedProofTreeIndex = namedProofTrees.size() - 1;
+		this.namedProofTree = namedProofTrees.get(initiallySelectedProofTreeIndex);
 		
 		proofBuilderPanel = new ProofBuilderPanel(namedProofTree) {
 			@Override
@@ -63,7 +72,15 @@ public class ProofBuilderFrame extends JFrame {
 		JScrollPane scrollPane = new JScrollPane(scrollPaneContentsPanel);
 		scrollPane.getHorizontalScrollBar().setUnitIncrement(10);
 		scrollPane.getVerticalScrollBar().setUnitIncrement(10);
-		getContentPane().add(scrollPane);
+		
+		JComboBox<NamedProofTree> namedProofTreesBox = new JComboBox<>(namedProofTrees.toArray(new NamedProofTree[namedProofTrees.size()]));
+		namedProofTreesBox.setSelectedIndex(initiallySelectedProofTreeIndex);
+		getContentPane().add(namedProofTreesBox, BorderLayout.NORTH);
+		namedProofTreesBox.addActionListener(e -> {
+			setNamedProofTree(namedProofTrees.get(namedProofTreesBox.getSelectedIndex()));
+		});
+		
+		getContentPane().add(scrollPane, BorderLayout.CENTER);
 		
 		JMenuBar menuBar = new JMenuBar();
 		JMenu editMenu = new JMenu("Edit");
@@ -161,14 +178,10 @@ public class ProofBuilderFrame extends JFrame {
 		dialog.setVisible(true);
 	}
 	
-	public static void showFrame(NamedProofTree namedProofTree) {
-		EventQueue.invokeLater(() -> {
-			new ProofBuilderFrame(namedProofTree);
-		});
-	}
-	
 	public static void main(String[] args) {
-		showFrame(new NamedProofTreesFactory().createNamedProofTree());
+		EventQueue.invokeLater(() -> {
+			new ProofBuilderFrame(new NamedProofTreesFactory().createNamedProofTrees());
+		});
 	}
 
 }

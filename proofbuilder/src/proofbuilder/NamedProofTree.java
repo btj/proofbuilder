@@ -21,5 +21,8 @@ public class NamedProofTree {
 		this.pythonConstants = pythonConstants;
 		this.proofTree = proofTree;
 	}
+	
+	@Override
+	public String toString() { return name; }
 
 }

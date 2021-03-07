@@ -28,8 +28,6 @@ public class ProofBuilderPanel extends JPanel {
 	int zoomExponent = 0;
 	
 	ProofBuilderPanel(NamedProofTree namedProofTree) {
-		this.constants = namedProofTree.constants;
-		this.holesContext = namedProofTree.holesContext;
 		setBackground(Color.white);
 		
 		addMouseListener(new MouseAdapter() {
@@ -39,10 +37,16 @@ public class ProofBuilderPanel extends JPanel {
 			}
 		});
 		
+		setNamedProofTree(namedProofTree);
+	}
+	
+	public void setNamedProofTree(NamedProofTree namedProofTree) {
+		this.constants = namedProofTree.constants;
+		this.holesContext = namedProofTree.holesContext;
 		this.proofTree = namedProofTree.proofTree;
 		refreshProofTreeView();
 	}
-	
+
 	void refreshProofTreeView() {
 		proofView = new ProofTreeView(this, null, proofTree);
 		proofView.computeLayout();
