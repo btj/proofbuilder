@@ -31,7 +31,6 @@ public class ProofTreeView extends ProofViewComponent {
 	static final int RULE_ICON_SPACING = 3;
 	static final int RULE_SPACING = 2;
 	static final int RULE_HEIGHT = 1;
-	static final int LATEX_POINT_SIZE = 20;
 
 	ProofTree proofTree;
 	TeXIcon typeIcon;
@@ -48,8 +47,8 @@ public class ProofTreeView extends ProofViewComponent {
 		super(proofBuilderPanel, parent);
 		proofTree = proofTree.getHoleContents();
 		this.proofTree = proofTree;
-		this.typeIcon = new TeXFormula(proofTree.getType().toLaTeX(proofTree.context, 0)).createTeXIcon(TeXConstants.STYLE_DISPLAY, LATEX_POINT_SIZE);
-		this.ruleIcon = new TeXFormula(proofTree.getRuleAsLaTeX()).createTeXIcon(TeXConstants.STYLE_DISPLAY, LATEX_POINT_SIZE);
+		this.typeIcon = new TeXFormula(proofTree.getType().toLaTeX(proofTree.context, 0)).createTeXIcon(TeXConstants.STYLE_DISPLAY, proofBuilderPanel.latexPointSize);
+		this.ruleIcon = new TeXFormula(proofTree.getRuleAsLaTeX()).createTeXIcon(TeXConstants.STYLE_DISPLAY, proofBuilderPanel.latexPointSize);
 		children = proofTree.uncurriedChildren.stream().filter(tree -> tree != null && tree.actualType.isAProp(tree.context)).map(tree -> new ProofTreeView(proofBuilderPanel, this, tree)).toArray(n -> new ProofTreeView[n]);
 		childComponents.addAll(Arrays.asList(children));
 	}
@@ -103,7 +102,7 @@ public class ProofTreeView extends ProofViewComponent {
 							if (nec.type.isAProp(nec.outerContext)) {
 								Term liftedType = nec.type.lift(0, index);
 								if (liftedType.unifiesWith(proofBuilderPanel.holesContext, type)) {
-									JMenuItem item = new JMenuItem(new TeXFormula(nec.name).createTeXIcon(TeXConstants.STYLE_DISPLAY, LATEX_POINT_SIZE));
+									JMenuItem item = new JMenuItem(new TeXFormula(nec.name).createTeXIcon(TeXConstants.STYLE_DISPLAY, proofBuilderPanel.latexPointSize));
 									int itemIndex = index;
 									item.addActionListener((ActionEvent e) -> {
 										proofBuilderPanel.changeTerm(() -> {
@@ -139,7 +138,7 @@ public class ProofTreeView extends ProofViewComponent {
 								proofBuilderPanel.holesContext.pop();
 							}
 							if (use) {
-								JMenuItem item = new JMenuItem(new TeXFormula(constant.getRuleAsLaTeX(Context.empty)).createTeXIcon(TeXConstants.STYLE_DISPLAY, LATEX_POINT_SIZE));
+								JMenuItem item = new JMenuItem(new TeXFormula(constant.getRuleAsLaTeX(Context.empty)).createTeXIcon(TeXConstants.STYLE_DISPLAY, proofBuilderPanel.latexPointSize));
 								item.addActionListener((ActionEvent e) -> {
 									proofBuilderPanel.changeTerm(() -> {
 										Term constantApplication = constant;
@@ -167,7 +166,7 @@ public class ProofTreeView extends ProofViewComponent {
 					if (type != null && type instanceof Product product) {
 						if (product.boundVariable == null) {
 							{
-								JMenuItem item = new JMenuItem(new TeXFormula("\\Rightarrow_I").createTeXIcon(TeXConstants.STYLE_DISPLAY, LATEX_POINT_SIZE));
+								JMenuItem item = new JMenuItem(new TeXFormula("\\Rightarrow_I").createTeXIcon(TeXConstants.STYLE_DISPLAY, proofBuilderPanel.latexPointSize));
 								item.addActionListener((ActionEvent e) -> {
 									proofBuilderPanel.changeTerm(() -> {
 										hole.checkEquals(new Lambda("u", product.domain, proofBuilderPanel.holesContext.createHole()));
@@ -180,7 +179,7 @@ public class ProofTreeView extends ProofViewComponent {
 							// Forward reasoning
 							if (product.domain.getHoleContents() instanceof Product domainProduct) {
 								String ruleName = domainProduct.boundVariable == null ? "\\Rightarrow_E" : "\\forall_E";
-								JMenuItem item = new JMenuItem(new TeXFormula("\\textrm{forward with }" + ruleName).createTeXIcon(TeXConstants.STYLE_DISPLAY, LATEX_POINT_SIZE));
+								JMenuItem item = new JMenuItem(new TeXFormula("\\textrm{forward with }" + ruleName).createTeXIcon(TeXConstants.STYLE_DISPLAY, proofBuilderPanel.latexPointSize));
 								item.addActionListener((ActionEvent e) -> {
 									proofBuilderPanel.changeTerm(() -> {
 										Hole functionHole = proofBuilderPanel.holesContext.createHole();
@@ -217,7 +216,7 @@ public class ProofTreeView extends ProofViewComponent {
 								}
 								if (use && matchingParameters.size() > 0) {
 									for (int matchingParameter : matchingParameters) {
-										JMenuItem item = new JMenuItem(new TeXFormula("\\textrm{forward with }" + constant.getRuleAsLaTeX(Context.empty)).createTeXIcon(TeXConstants.STYLE_DISPLAY, LATEX_POINT_SIZE));
+										JMenuItem item = new JMenuItem(new TeXFormula("\\textrm{forward with }" + constant.getRuleAsLaTeX(Context.empty)).createTeXIcon(TeXConstants.STYLE_DISPLAY, proofBuilderPanel.latexPointSize));
 										item.addActionListener((ActionEvent e) -> {
 											proofBuilderPanel.changeTerm(() -> {
 												Term constantApplication = constant;
@@ -255,7 +254,7 @@ public class ProofTreeView extends ProofViewComponent {
 					}
 					
 					{
-						JMenuItem item = new JMenuItem(new TeXFormula("\\Rightarrow_E").createTeXIcon(TeXConstants.STYLE_DISPLAY, LATEX_POINT_SIZE));
+						JMenuItem item = new JMenuItem(new TeXFormula("\\Rightarrow_E").createTeXIcon(TeXConstants.STYLE_DISPLAY, proofBuilderPanel.latexPointSize));
 						item.addActionListener((ActionEvent e) -> {
 							proofBuilderPanel.changeTerm(() -> {
 								Hole antecedentHole = proofBuilderPanel.holesContext.createHole();

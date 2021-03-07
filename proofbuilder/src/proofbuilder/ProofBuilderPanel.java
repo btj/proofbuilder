@@ -24,6 +24,8 @@ public abstract class ProofBuilderPanel extends JPanel {
 	ProofTree proofTree;
 	ProofTreeView proofView;
 	int nbChanges;
+	int latexPointSize = 20;
+	int zoomExponent = 0;
 	
 	ProofBuilderPanel(Map<String, Constant> constants, HolesContext holesContext, ProofTree proofTree) {
 		this.constants = constants;
@@ -65,6 +67,20 @@ public abstract class ProofBuilderPanel extends JPanel {
 		proofView.y = MARGIN;
 		revalidate();
 		repaint();
+	}
+	
+	void setZoomExponent(int zoomExponent) {
+		this.zoomExponent = zoomExponent;
+		latexPointSize = (int)(20 * Math.pow(1.25, zoomExponent));
+		refreshProofTreeView();
+	}
+	
+	void zoomIn() {
+		setZoomExponent(zoomExponent + 1);
+	}
+	
+	void zoomOut() {
+		setZoomExponent(zoomExponent - 1);
 	}
 	
 	void changeTerm(Runnable body) {
