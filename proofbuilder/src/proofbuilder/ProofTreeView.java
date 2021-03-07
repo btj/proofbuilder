@@ -96,25 +96,72 @@ public class ProofTreeView extends ProofViewComponent {
 				if (term instanceof Hole hole) {
 					Term type = hole.getType().getHoleContents();
 					
-					Context context = proofTree.context;
-					int index = 0;
-					while (context instanceof NonemptyContext nec) {
-						if (nec.type.isAProp(nec.outerContext)) {
-							Term liftedType = nec.type.lift(0, index);
-							if (liftedType.unifiesWith(proofBuilderPanel.holesContext, type)) {
-								JMenuItem item = new JMenuItem(new TeXFormula(nec.name).createTeXIcon(TeXConstants.STYLE_DISPLAY, LATEX_POINT_SIZE));
-								int itemIndex = index;
+					{
+						Context context = proofTree.context;
+						int index = 0;
+						while (context instanceof NonemptyContext nec) {
+							if (nec.type.isAProp(nec.outerContext)) {
+								Term liftedType = nec.type.lift(0, index);
+								if (liftedType.unifiesWith(proofBuilderPanel.holesContext, type)) {
+									JMenuItem item = new JMenuItem(new TeXFormula(nec.name).createTeXIcon(TeXConstants.STYLE_DISPLAY, LATEX_POINT_SIZE));
+									int itemIndex = index;
+									item.addActionListener((ActionEvent e) -> {
+										proofBuilderPanel.changeTerm(() -> {
+											hole.checkEquals(new Variable(itemIndex));
+										});
+									});
+									menu.add(item);
+									show = true;
+								}
+							}
+							context = nec.outerContext;
+							index++;
+						}
+					}
+					
+					{
+						for (Constant constant : proofBuilderPanel.constants.values()) {
+							boolean use = false;
+							{
+								Term constantType = constant.type;
+								proofBuilderPanel.holesContext.push();
+								for (int argCount = 0; argCount < constant.nbArguments; argCount++) {
+									Product productType = (Product)constantType;
+									if (productType.boundVariable != null) {
+										Hole placeholderArgument = proofBuilderPanel.holesContext.createHole();
+										placeholderArgument.checkAgainst(Context.empty, productType.domain);
+										constantType = productType.range.getHoleContents().with(placeholderArgument, 0);
+									} else
+										constantType = productType.range.getHoleContents();
+								}
+								if (constantType.unifiesWith(proofBuilderPanel.holesContext, type))
+									use = true;
+								proofBuilderPanel.holesContext.pop();
+							}
+							if (use) {
+								JMenuItem item = new JMenuItem(new TeXFormula(constant.getRuleAsLaTeX(Context.empty)).createTeXIcon(TeXConstants.STYLE_DISPLAY, LATEX_POINT_SIZE));
 								item.addActionListener((ActionEvent e) -> {
 									proofBuilderPanel.changeTerm(() -> {
-										hole.checkEquals(new Variable(itemIndex));
+										Term constantApplication = constant;
+										
+										Term constantType = constant.type;
+										for (int i = 0; i < constant.nbArguments; i++) {
+											Product productType = (Product)constantType;
+											Term argument = proofBuilderPanel.holesContext.createHole();
+											constantApplication = new Application(constantApplication, argument);
+											if (productType.boundVariable != null) {
+												constantType = productType.range.getHoleContents().with(argument, 0);
+											} else
+												constantType = productType.range.getHoleContents();
+										}
+										
+										hole.checkEquals(constantApplication);
 									});
 								});
 								menu.add(item);
 								show = true;
 							}
 						}
-						context = nec.outerContext;
-						index++;
 					}
 					
 					if (type != null && type instanceof Product product) {

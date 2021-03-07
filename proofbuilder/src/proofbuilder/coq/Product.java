@@ -69,8 +69,7 @@ public class Product extends Term {
 	
 	public ProofTree check(Context context) {
 		ProofTree domainTree = domain.check(context);
-		if (!(domainTree.actualType instanceof Sort))
-			throw typeError("Domain of product must be a type");
+		domainTree.actualType.checkIsSort();
 		ProofTree rangeTree;
 		if (boundVariable == null)
 			rangeTree = range.check(context);

@@ -111,16 +111,7 @@ public class Parser {
 		}
 		case FORALL -> {
 			eat();
-			if (tokenType == TokenType.LPAREN)
-				return parseProducts();
-			String boundVariable = expectIdent();
-			expect(TokenType.COLON);
-			Term domain = parseTerm();
-			expect(TokenType.COMMA);
-			context.add(boundVariable);
-			Term range = parseTerm();
-			context.remove(context.size() - 1);
-			return new Product(boundVariable, domain, range);
+			return parseProducts();
 		}
 		case FUN -> {
 			eat();

@@ -109,11 +109,12 @@ public class ProofBuilder {
 			}
 		});
 		
+		rule("bimplies_refl", "forall P, bimplies P P", "\\Rightarrow_\\texttt{exp}_\\mathsf{id}", 1);
 		parameter("som", "aexp", "\\texttt{som}");
 		infixOperator("band", "bexp -> bexp -> bexp", "\\;\\texttt{and}\\;", Term.PREC_EXP_CONJ, Term.PREC_EXP_CONJ + 1, Term.PREC_EXP_CONJ);
 		rule("Cseq", "forall (P Q R: bexp) (p1 p2: stmt), correct P p1 R -> correct R p2 Q -> correct P (seq p1 p2) Q", "\\textrm{\\textsc{Seq}}", 7);
-//		Term seqProof = parse("?");
-		Term seqProof = parse("Cseq ? ? ? ? ? ? ?");
+		Term seqProof = parse("?");
+//		Term seqProof = parse("Cseq ? ? ? ? ? ? ?");
 		Term seqGoal = parse("correct btrue (seq (gets i 0) (gets som 0)) (band (beq i 0) (beq som 0))");
 		ProofTree proofTree = seqProof.checkAgainst(Context.empty, seqGoal);
 		
