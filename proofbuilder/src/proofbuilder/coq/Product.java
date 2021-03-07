@@ -78,15 +78,17 @@ public class Product extends Term {
 		rangeTree.actualType.checkIsSort();
 		
 		Term type;
-		if (domainTree.actualType instanceof PropSort) {
-			type = rangeTree.actualType;
-		} else if (rangeTree.actualType instanceof PropSort) {
-			type = rangeTree.actualType;
+		Term domainType = domainTree.actualType.getHoleContents();
+		Term rangeType = rangeTree.actualType.getHoleContents();
+		if (domainType instanceof PropSort) {
+			type = rangeType;
+		} else if (rangeType instanceof PropSort) {
+			type = domainType;
 		} else {
-			if (((TypeSort)domainTree.actualType).level > ((TypeSort)rangeTree.actualType).level)
-				type = domainTree.actualType;
+			if (((TypeSort)domainType).level > ((TypeSort)rangeType).level)
+				type = domainType;
 			else
-				type = rangeTree.actualType;
+				type = rangeType;
 		}
 		return new ProofTree(context, this, type, null, List.of(domainTree, rangeTree));
 	}

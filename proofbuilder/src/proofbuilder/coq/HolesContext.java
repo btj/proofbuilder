@@ -1,8 +1,7 @@
 package proofbuilder.coq;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 public class HolesContext {
 
@@ -49,6 +48,10 @@ public class HolesContext {
 			holes.remove(holes.size() - 1);
 		while (undoActions.size() > undoStackEntry.nbUndoActions)
 			undoActions.remove(undoActions.size() - 1).run();
+	}
+
+	public List<Hole> getHoles() {
+		return List.copyOf(holes);
 	}
 	
 }

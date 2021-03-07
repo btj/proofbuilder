@@ -15,7 +15,7 @@ import proofbuilder.coq.Constant;
 import proofbuilder.coq.HolesContext;
 import proofbuilder.coq.ProofTree;
 
-public class ProofBuilderPanel extends JPanel {
+public abstract class ProofBuilderPanel extends JPanel {
 	
 	static final int MARGIN = 20;
 
@@ -40,14 +40,18 @@ public class ProofBuilderPanel extends JPanel {
 		addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyTyped(KeyEvent e) {
-				if (e.getKeyChar() == 26)
+				if (e.getKeyChar() == 26) // Ctrl+Z
 					undo();
+				if (e.getKeyChar() == 6) // Ctrl+F
+					showFillHoleDialog();
 			}
 		});
 		
 		this.proofTree = proofTree;
 		refreshProofTreeView();
 	}
+	
+	abstract void showFillHoleDialog();
 	
 	@Override
 	public boolean isFocusable() {
