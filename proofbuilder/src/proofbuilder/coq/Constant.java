@@ -46,7 +46,7 @@ public class Constant extends Term {
 	}
 	
 	public String toLaTeX(Context context, List<Term> arguments, int precedence) {
-		return "\\mathsf{" + name + "}(" + arguments.stream().map(arg -> arg.toLaTeX(context, 0)).collect(Collectors.joining(", ")) + ")";
+		return ruleLaTeX + "(" + arguments.stream().map(arg -> arg.toLaTeX(context, 0)).collect(Collectors.joining(", ")) + ")";
 	}
 	
 	public String getRuleAsLaTeX(Context context) {

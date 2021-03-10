@@ -29,10 +29,14 @@ public class NamedProofTreesFactory {
 	}
 	
 	void parameter(String name, String type) {
+		if (constants.containsKey(name))
+			throw new RuntimeException("Constant already defined");
 		constants.put(name, new Constant(name, parseType(type)));
 	}
 	
 	void parameter(String name, String type, String laTeX) {
+		if (constants.containsKey(name))
+			throw new RuntimeException("Constant already defined");
 		constants.put(name, new Constant(name, parseType(type)) {
 			@Override
 			public String toLaTeX(Context context, int precedence) {
@@ -42,6 +46,8 @@ public class NamedProofTreesFactory {
 	}
 	
 	void infixOperator(String name, String type, String operatorLaTeX, int precedence, int leftPrec, int rightPrec) {
+		if (constants.containsKey(name))
+			throw new RuntimeException("Constant already defined");
 		constants.put(name, new Constant(name, parseType(type), operatorLaTeX, 2) {
 			@Override
 			public String toLaTeX(Context context, List<Term> arguments, int targetPrecedence) {
@@ -51,6 +57,8 @@ public class NamedProofTreesFactory {
 	}
 	
 	void rule(String name, String type, String laTeX, int nbArgs) {
+		if (constants.containsKey(name))
+			throw new RuntimeException("Constant already defined");
 		constants.put(name, new Constant(name, parseType(type), laTeX, nbArgs));
 	}
 	
@@ -176,6 +184,7 @@ public class NamedProofTreesFactory {
 		});
 		parameter("n", "aexp", "\\texttt{n}");
 		infixOperator("ble", "aexp -> aexp -> bexp", "\\;\\texttt{{<}\\!\\!{=}}\\;", Term.PREC_EXP_EQ, Term.PREC_EXP_EQ + 1, Term.PREC_EXP_EQ + 1);
+		infixOperator("blt", "aexp -> aexp -> bexp", "\\;\\texttt{{<}}\\;", Term.PREC_EXP_EQ, Term.PREC_EXP_EQ + 1, Term.PREC_EXP_EQ + 1);
 		infixOperator("bneq", "aexp -> aexp -> bexp", "\\;\\texttt{{!}{=}}\\;", Term.PREC_EXP_EQ, Term.PREC_EXP_EQ + 1, Term.PREC_EXP_EQ + 1);
 		infixOperator("aplus", "aexp -> aexp -> aexp", "\\;\\texttt{+}\\;", Term.PREC_EXP_PLUS, Term.PREC_EXP_PLUS, Term.PREC_EXP_PLUS + 1);
 		parameter("1", "aexp", "\\texttt{1}");
@@ -215,6 +224,50 @@ public class NamedProofTreesFactory {
 					Map.entry("#AND", constants.get("band"))
 			);
 			result.add(new NamedProofTree("som == sum(range(n))", constants, holesContext, pythonConstants, proofTree));
+			holesContext = new HolesContext();
+		}
+		
+		constants.put("if", new Constant("if", parseType("bexp -> stmt -> stmt -> stmt"), "\\mathsf{if}", 3) {
+			@Override
+			public String toLaTeX(Context context, List<Term> arguments, int precedence) {
+				return """
+						\\begin{array}{l}
+						\\texttt{if}\\ %s\\texttt{:}\\\\
+						\\quad %s\\\\
+						\\texttt{else{:}}\\\\
+						\\quad %s
+						\\end{array}
+						""".formatted(
+								arguments.get(0).toLaTeX(context, 0),
+								arguments.get(1).toLaTeX(context, 0),
+								arguments.get(2).toLaTeX(context, 0));
+			}
+		});
+		parameter("min3", "aexp", "\\texttt{min}");
+		parameter("x", "aexp", "\\texttt{x}");
+		parameter("y", "aexp", "\\texttt{y}");
+		parameter("z", "aexp", "\\texttt{z}");
+		constants.put("amin3", new Constant("amin3", parseType("aexp -> aexp -> aexp -> aexp"), "\\mathsf{min}", 3));
+		rule("Cif", "forall P E p1 p2 Q, correct (band P E) p1 Q -> correct (band P (bnot E)) p2 Q -> correct P (if E p1 p2) Q", "\\texttt{if}", 7);
+		
+		{
+			assert holesContext.getNbUnfilledHoles() == 0;
+			holesContext = new HolesContext();
+			Term min3Goal = parse("""
+					correct
+						btrue
+						(if (blt x y)
+						   (if (blt x z)
+						      (gets min3 x)
+						      (gets min3 z))
+						   (if (blt y z)
+						      (gets min3 y)
+						      (gets min3 z)))
+					    (beq min3 (amin3 x y z))
+					""");
+			Term min3Proof = parse("?");
+			ProofTree proofTree = min3Proof.checkAgainst(Context.empty, min3Goal);
+			result.add(new NamedProofTree("min3", constants, holesContext, pythonConstants, proofTree));
 			holesContext = new HolesContext();
 		}
 		
