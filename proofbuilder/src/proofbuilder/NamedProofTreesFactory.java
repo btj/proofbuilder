@@ -129,7 +129,7 @@ public class NamedProofTreesFactory {
 			}
 		});
 		infixOperator("bimplies", "bexp -> bexp -> Prop", "\\Rightarrow_\\texttt{exp}", Term.PREC_BIMPLIES, Term.PREC_BIMPLIES + 1, Term.PREC_BIMPLIES);
-		rule("Cassign", "forall (P: bexp) (Q: bexp) (E: aexp) (x: aexp), bimplies P (bsubst Q E x) -> correct P (gets x E) Q", "\\texttt{=}", 5);
+		rule("Cassign", "forall (Q: bexp) (E: aexp) (x: aexp), correct (bsubst Q E x) (gets x E) Q", "\\texttt{=}", 3);
 
 		{
 			assert holesContext.getNbUnfilledHoles() == 0;
