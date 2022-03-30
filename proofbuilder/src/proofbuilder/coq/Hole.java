@@ -69,7 +69,7 @@ public class Hole extends AbstractHole {
 	
 	public Term getHoleContents() {
 		if (contents != null)
-			return contents;
+			return contents.getHoleContents();
 		return this;
 	}
 	
