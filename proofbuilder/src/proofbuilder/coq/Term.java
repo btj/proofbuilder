@@ -100,7 +100,8 @@ public abstract class Term {
 	 */
 	public abstract Term lift(int startIndex, int nbBindings);
 	
-	public abstract Term with(Term term, int index);
+	public abstract Term with(Term term, int index, boolean returnNullOnFailure);
+	public final Term with(Term term, int index) { return with(term, index, false); } 
 	
 	public static final int PREC_POSTFIX = 2000;
 	public static final int PREC_FUNC = 1000;
@@ -147,6 +148,14 @@ public abstract class Term {
 			holesContext.pop();
 		}
 		return false;
+	}
+	
+	public Term applyTo(Term argument) {
+		return new Application(this, argument);
+	}
+	
+	public Term reduce() {
+		return this;
 	}
 	
 }

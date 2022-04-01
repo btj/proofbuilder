@@ -37,7 +37,7 @@ public class Constant extends Term {
 	
 	public Term lift(int startIndex, int nbBindings) { return this; }
 	
-	public Term with(Term term, int index) { return this; }
+	public Term with(Term term, int index, boolean returnNullOnFailure) { return this; }
 	
 	public ProofTree check(Context context) { return new ProofTree(context, this, type, null, List.of()); }
 	

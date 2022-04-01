@@ -60,12 +60,16 @@ public class Application extends Term {
 		return new Application(newFunction, newArgument);
 	}
 	
-	public Term with(Term term, int index) {
-		Term newFunction = function.with(term, index);
-		Term newArgument = argument.with(term, index);
+	public Term with(Term term, int index, boolean returnNullOnFailure) {
+		Term newFunction = function.with(term, index, returnNullOnFailure);
+		if (newFunction == null)
+			return null;
+		Term newArgument = argument.with(term, index, returnNullOnFailure);
+		if (newArgument == null)
+			return null;
 		if (newFunction == function && newArgument == argument)
 			return this;
-		return new Application(newFunction, newArgument);
+		return newFunction.applyTo(newArgument);
 	}
 	
 	public ProofTree check(Context context) {
@@ -93,5 +97,13 @@ public class Application extends Term {
 	}
 	
 	public Term getHead() { return function.getHead(); }
-
+	
+	@Override
+	public Term reduce() {
+		Term newFunction = function.reduce();
+		Term newArgument = argument.reduce();
+		if (newFunction == function && newArgument == argument)
+			return this;
+		return newFunction.applyTo(newArgument);
+	}
 }

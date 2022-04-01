@@ -82,9 +82,11 @@ public class Hole extends AbstractHole {
 		if (other == this)
 			return;
 		if (context == null) throw new AssertionError();
+		ProofTree oldProofTree = childProofTrees[0];
+		Term oldContents = contents;
 		holesContext.addUndoAction(() -> {
-			childProofTrees[0] = null;
-			contents = null;
+			childProofTrees[0] = oldProofTree;
+			contents = oldContents;
 		});
 		if (type != null) {
 			childProofTrees[0] = other.checkAgainst(context, type);
@@ -112,14 +114,38 @@ public class Hole extends AbstractHole {
 	}
 	
 	@Override
-	public Term with(Term term, int index) {
+	public Term with(Term term, int index, boolean returnNullOnFailure) {
 		if (contents != null)
 			return contents.with(term, index);
+		if (returnNullOnFailure)
+			return null;
 		throw new RuntimeException("Not yet implemented");
 	}
 
 	public boolean isFilled() {
 		return contents != null;
+	}
+	
+	@Override
+	public Term applyTo(Term argument) {
+		if (contents != null)
+			return contents.applyTo(argument);
+		return super.applyTo(argument);
+	}
+	
+	public Term reduce() {
+		if (contents != null)
+			return contents.reduce();
+		this.reduceType();
+		return this;
+	}
+	
+	public void reduceType() {
+		Term oldType = this.type;
+		holesContext.addUndoAction(() -> {
+			this.type = oldType;
+		});
+		this.type = this.type.reduce();
 	}
 	
 }

@@ -50,7 +50,7 @@ public class ProofBuilderFrame extends JFrame {
 		super("Proof Builder");
 		
 		this.namedProofTrees = namedProofTrees;
-		int initiallySelectedProofTreeIndex = namedProofTrees.size() - 1;
+		int initiallySelectedProofTreeIndex = 0;
 		this.namedProofTree = namedProofTrees.get(initiallySelectedProofTreeIndex);
 		
 		proofBuilderPanel = new ProofBuilderPanel(namedProofTree) {

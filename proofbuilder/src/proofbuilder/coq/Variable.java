@@ -26,10 +26,13 @@ public class Variable extends Term {
 		return new Variable(deBruijnIndex + nbBindings);
 	}
 	
-	public Term with(Term term, int index) {
+	public Term with(Term term, int index, boolean returnNullOnFailure) {
 		if (deBruijnIndex == index)
 			return term.lift(0, index);
-		return this;
+		else if (deBruijnIndex > index)
+			return new Variable(deBruijnIndex - 1);
+		else
+			return this;
 	}
 	
 	public ProofTree check(Context context) {

@@ -7,11 +7,14 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.Map;
 
 import javax.swing.JPanel;
 
 import proofbuilder.coq.Constant;
+import proofbuilder.coq.Context;
+import proofbuilder.coq.EmptyContext;
 import proofbuilder.coq.HolesContext;
 import proofbuilder.coq.ProofTree;
 
@@ -22,6 +25,7 @@ public class ProofBuilderPanel extends JPanel {
 	Map<String, Constant> constants;
 	HolesContext holesContext;
 	ProofTree proofTree;
+	ArrayList<ProofTree> proofTreeUndoStack = new ArrayList<>();
 	ProofTreeView proofView;
 	int nbChanges;
 	int latexPointSize = 20;
@@ -72,7 +76,9 @@ public class ProofBuilderPanel extends JPanel {
 	
 	void changeTerm(Runnable body) {
 		holesContext.push();
+		proofTreeUndoStack.add(this.proofTree);
 		body.run();
+		this.proofTree = this.proofTree.term.reduce().checkAgainst(Context.empty, this.proofTree.expectedType);
 		refreshProofTreeView();
 		nbChanges++;
 	}
@@ -80,6 +86,7 @@ public class ProofBuilderPanel extends JPanel {
 	void undo() {
 		if (nbChanges > 0) {
 			holesContext.pop();
+			this.proofTree = proofTreeUndoStack.remove(proofTreeUndoStack.size() - 1);
 			refreshProofTreeView();
 			nbChanges--;
 		}

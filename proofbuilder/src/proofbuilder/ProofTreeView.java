@@ -91,16 +91,18 @@ public class ProofTreeView extends ProofViewComponent {
 				JPopupMenu menu = new JPopupMenu();
 				boolean show = false;
 				
+				final Context context = proofTree.context;
 				Term term = proofTree.term.getHoleContents();
+				
 				if (term instanceof Hole hole) {
 					Term type = hole.getType().getHoleContents();
 					
 					{
-						Context context = proofTree.context;
+						Context ctxt = context;
 						int index = 0;
-						while (context instanceof NonemptyContext nec) {
+						while (ctxt instanceof NonemptyContext nec) {
 							if (nec.type.isAProp(nec.outerContext)) {
-								Term liftedType = nec.type.lift(0, index);
+								Term liftedType = nec.type.lift(0, index + 1);
 								if (liftedType.unifiesWith(proofBuilderPanel.holesContext, type)) {
 									JMenuItem item = new JMenuItem(new TeXFormula(nec.name).createTeXIcon(TeXConstants.STYLE_DISPLAY, proofBuilderPanel.latexPointSize));
 									int itemIndex = index;
@@ -113,7 +115,7 @@ public class ProofTreeView extends ProofViewComponent {
 									show = true;
 								}
 							}
-							context = nec.outerContext;
+							ctxt = nec.outerContext;
 							index++;
 						}
 					}
@@ -128,7 +130,7 @@ public class ProofTreeView extends ProofViewComponent {
 									Product productType = (Product)constantType;
 									if (productType.boundVariable != null) {
 										Hole placeholderArgument = proofBuilderPanel.holesContext.createHole();
-										placeholderArgument.checkAgainst(Context.empty, productType.domain);
+										placeholderArgument.checkAgainst(context, productType.domain);
 										constantType = productType.range.getHoleContents().with(placeholderArgument, 0);
 									} else
 										constantType = productType.range.getHoleContents();
@@ -143,11 +145,14 @@ public class ProofTreeView extends ProofViewComponent {
 									proofBuilderPanel.changeTerm(() -> {
 										Term constantApplication = constant;
 										
+										ArrayList<Hole> argumentHoles = new ArrayList<>();
+										
 										Term constantType = constant.type;
 										for (int i = 0; i < constant.nbArguments; i++) {
 											Product productType = (Product)constantType;
-											Term argument = proofBuilderPanel.holesContext.createHole();
-											constantApplication = new Application(constantApplication, argument);
+											Hole argument = proofBuilderPanel.holesContext.createHole();
+											argumentHoles.add(argument);
+											constantApplication = constantApplication.applyTo(argument);
 											if (productType.boundVariable != null) {
 												constantType = productType.range.getHoleContents().with(argument, 0);
 											} else
@@ -205,13 +210,13 @@ public class ProofTreeView extends ProofViewComponent {
 										}
 										if (productType.boundVariable != null) {
 											Hole placeholderArgument = proofBuilderPanel.holesContext.createHole();
-											placeholderArgument.checkAgainst(Context.empty, productType.domain);
+											placeholderArgument.checkAgainst(context, productType.domain);
 											constantType = productType.range.getHoleContents().with(placeholderArgument, 0);
 										} else
 											constantType = productType.range.getHoleContents();
 										parameterIndex++;
 									}
-									use = constantType.isAProp(Context.empty);
+									use = constantType.isAProp(context);
 									proofBuilderPanel.holesContext.pop();
 								}
 								if (use && matchingParameters.size() > 0) {
@@ -250,6 +255,15 @@ public class ProofTreeView extends ProofViewComponent {
 									}
 								}
 							}
+						} else {
+							JMenuItem item = new JMenuItem(new TeXFormula("\\forall_I").createTeXIcon(TeXConstants.STYLE_DISPLAY, proofBuilderPanel.latexPointSize));
+							item.addActionListener((ActionEvent e) -> {
+								proofBuilderPanel.changeTerm(() -> {
+									hole.checkEquals(new Lambda(product.boundVariable, product.domain, proofBuilderPanel.holesContext.createHole()));
+								});
+							});
+							menu.add(item);
+							show = true;
 						}
 					}
 					

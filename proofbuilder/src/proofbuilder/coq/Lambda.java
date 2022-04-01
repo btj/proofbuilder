@@ -35,9 +35,13 @@ public class Lambda extends Term {
 		return new Lambda(boundVariable, newDomain, newBody);
 	}
 	
-	public Term with(Term term, int index) {
-		Term newDomain = domain.with(term, index);
-		Term newBody = body.with(term, index + 1);
+	public Term with(Term term, int index, boolean returnNullOnFailure) {
+		Term newDomain = domain.with(term, index, returnNullOnFailure);
+		if (newDomain == null)
+			return null;
+		Term newBody = body.with(term, index + 1, returnNullOnFailure);
+		if (newBody == null)
+			return null;
 		if (newDomain == domain && newBody == body)
 			return this;
 		return new Lambda(boundVariable, newDomain, newBody);
@@ -48,12 +52,31 @@ public class Lambda extends Term {
 		if (!(domainTree.actualType instanceof Sort))
 			throw typeError("Domain of lambda must be a type");
 		ProofTree bodyTree = body.check(Context.cons(context, boundVariable, domain));
-		return new ProofTree(context, this, new Product(boundVariable, domain, bodyTree.actualType), null, List.of(domainTree, bodyTree));
+		boolean isImplication = domainTree.actualType instanceof PropSort;
+		Term type = new Product(isImplication ? null : boundVariable, domain, bodyTree.actualType);
+		return new ProofTree(context, this, type, null, List.of(domainTree, bodyTree));
 	}
 	
 	public String toLaTeX(Context context, int precedence) {
 		return parenthesize(precedence, 0, "\\lambda " + boundVariable + (showDomains ? ": " + domain.toLaTeX(context, 0) : "") + ".\\; " +
 				body.toLaTeX(Context.cons(context, boundVariable, domain), 0));
+	}
+	
+	@Override
+	public Term applyTo(Term argument) {
+		Term result = this.body.with(argument, 0, true);
+		if (result != null)
+			return result;
+		return super.applyTo(argument);
+	}
+	
+	@Override
+	public Term reduce() {
+		Term newDomain = domain.reduce();
+		Term newBody = body.reduce();
+		if (newDomain == domain && newBody == body)
+			return this;
+		return new Lambda(boundVariable, newDomain, newBody);
 	}
 	
 }

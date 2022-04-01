@@ -65,11 +65,45 @@ public class NamedProofTreesFactory {
 	public List<NamedProofTree> createNamedProofTrees() {
 		ArrayList<NamedProofTree> result = new ArrayList<>();
 		
+		infixOperator("or", "Prop -> Prop -> Prop", "\\lor", Term.PREC_DISJ, Term.PREC_DISJ + 1, Term.PREC_DISJ);
+		parameter("exists", "forall (T: Type), (T -> Prop) -> Prop");
+		parameter("not", "Prop -> Prop");
+		parameter("False", "Prop");
+		
+		rule("not_intro", "forall P: Prop, (P -> False) -> not P", "\\lnot_I", 2);
+		rule("not_elim", "forall P: Prop, not P -> P -> False", "\\lnot_E", 3);
+		rule("False_elim", "forall P: Prop, False -> P", "\\mathsf{False}_E", 2);
+		rule("or_elim", "forall (P Q R: Prop), or P Q -> (P -> R) -> (Q -> R) -> R", "\\lor_E", 6);
+		rule("exists_elim", "forall (T: Type) (P: T -> Prop) (Q: Prop), (forall x, P x -> Q) -> exists T P -> Q", "\\exists_E", 5);
+		rule("exists_intro", "forall (T: Type) (P: T -> Prop) (x: T), P x -> exists T P", "\\exists_I", 4);
+		
+		parameter("object", "Type");
+		parameter("P", "object -> Prop");
+		parameter("c", "object");
+		parameter("f", "object -> object");
+		
+		{
+			assert holesContext.getNbUnfilledHoles() == 0;
+			holesContext = new HolesContext();
+			Term exampleProof = parse("?");
+			ProofTree proofTree = exampleProof.checkAgainst(Context.empty, parseType("P c -> exists object (fun x: object => P x)"));
+			result.add(new NamedProofTree("Voorbeeld 0", constants, holesContext, Map.of(), proofTree));
+			holesContext = new HolesContext();
+		}
+		
+		{
+			assert holesContext.getNbUnfilledHoles() == 0;
+			holesContext = new HolesContext();
+			Term exampleProof = parse("?");
+			ProofTree proofTree = exampleProof.checkAgainst(Context.empty, parseType("(forall x: object, P x) -> not (exists object (fun x: object => or (not (P x)) (not (P (f x)))))"));
+			result.add(new NamedProofTree("Voorbeeld 1", constants, holesContext, Map.of(), proofTree));
+			holesContext = new HolesContext();
+		}
+		
 		infixOperator("and", "Prop -> Prop -> Prop", "\\land", Term.PREC_CONJ, Term.PREC_CONJ + 1, Term.PREC_CONJ);
 		rule("and_proj1", "forall (P: Prop) (Q: Prop), and P Q -> P", "\\land_{E^1}", 3);
 		rule("and_proj2", "forall (P: Prop) (Q: Prop), and P Q -> Q", "\\land_{E^2}", 3);
 		
-		parameter("object", "Type");
 		parameter("mens", "object -> Prop");
 		parameter("sterfelijk", "object -> Prop");
 		parameter("Socrates", "object");

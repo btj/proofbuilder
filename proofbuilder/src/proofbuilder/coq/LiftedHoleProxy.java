@@ -58,12 +58,14 @@ public class LiftedHoleProxy extends AbstractHole {
 	}
 
 	@Override
-	public Term with(Term term, int index) {
+	public Term with(Term term, int index, boolean returnNullOnFailure) {
 		if (startIndex <= index && index < startIndex + nbBindings) {
 			if (startIndex == 0 && nbBindings == 1)
 				return hole;
 			return new LiftedHoleProxy(hole, startIndex, nbBindings - 1);
 		}
+		if (returnNullOnFailure)
+			return null;
 		throw new RuntimeException("Not yet implemented");
 	}
 	
@@ -73,6 +75,14 @@ public class LiftedHoleProxy extends AbstractHole {
 		if (holeContents instanceof Hole)
 			return this;
 		return holeContents.lift(startIndex, nbBindings);
+	}
+	
+	@Override
+	public Term reduce() {
+		Term newHole = hole.reduce();
+		if (newHole == hole)
+			return this;
+		return newHole.lift(startIndex, nbBindings);
 	}
 
 }

@@ -45,16 +45,20 @@ public class Product extends Term {
 			newRange = range.lift(startIndex + 1, nbBindings);
 		if (newDomain == domain && newRange == range)
 			return this;
-		return new Product(boundVariable, domain, range);
+		return new Product(boundVariable, newDomain, newRange);
 	}
 	
-	public Term with(Term term, int index) {
-		Term newDomain = domain.with(term, index);
+	public Term with(Term term, int index, boolean returnNullOnFailure) {
+		Term newDomain = domain.with(term, index, returnNullOnFailure);
+		if (newDomain == null)
+			return null;
 		Term newRange;
 		if (boundVariable == null)
-			newRange = range.with(term, index);
+			newRange = range.with(term, index, returnNullOnFailure);
 		else
-			newRange = range.with(term, index + 1);
+			newRange = range.with(term, index + 1, returnNullOnFailure);
+		if (newRange == null)
+			return null;
 		if (newDomain == domain && newRange == range)
 			return this;
 		return new Product(boundVariable, newDomain, newRange);
@@ -99,6 +103,14 @@ public class Product extends Term {
 		else
 			return parenthesize(precedence, 0, "\\forall " + boundVariable + (showDomains ? ": " + domain.toLaTeX(context, 0) : "") + ".\\; " +
 					range.toLaTeX(Context.cons(context, boundVariable, domain), 0));
+	}
+	
+	public Term reduce() {
+		Term newDomain = domain.reduce();
+		Term newRange = range.reduce();
+		if (newDomain == domain && newRange == range)
+			return this;
+		return new Product(boundVariable, newDomain, newRange);
 	}
 	
 }
