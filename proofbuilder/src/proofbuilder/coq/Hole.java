@@ -103,6 +103,10 @@ public class Hole extends AbstractHole {
 			return contents.lift(startIndex, nbBindings);
 		if (nbBindings == 0)
 			return this;
+	    if (startIndex == 0 && nbBindings < 0) {
+	    	this.checkEqualsCore(new LiftedHoleProxy(holesContext.createHole(), 0, -nbBindings));
+	    	return contents.lift(startIndex, nbBindings);
+	    }
 		return new LiftedHoleProxy(this, startIndex, nbBindings);
 	}
 	

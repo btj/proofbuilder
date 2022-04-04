@@ -53,7 +53,10 @@ public class Lambda extends Term {
 			throw typeError("Domain of lambda must be a type");
 		ProofTree bodyTree = body.check(Context.cons(context, boundVariable, domain));
 		boolean isImplication = domainTree.actualType instanceof PropSort;
-		Term type = new Product(isImplication ? null : boundVariable, domain, bodyTree.actualType);
+		Term rangeType = bodyTree.actualType;
+		if (isImplication)
+			rangeType = rangeType.lift(0, -1); // TODO: First check if #0 appears free in the range? This will crash if it does.
+		Term type = new Product(isImplication ? null : boundVariable, domain, rangeType);
 		return new ProofTree(context, this, type, null, List.of(domainTree, bodyTree));
 	}
 	
