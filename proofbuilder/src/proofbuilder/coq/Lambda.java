@@ -61,8 +61,9 @@ public class Lambda extends Term {
 	}
 	
 	public String toLaTeX(Context context, int precedence) {
-		return parenthesize(precedence, 0, "\\lambda " + boundVariable + (showDomains ? ": " + domain.toLaTeX(context, 0) : "") + ".\\; " +
-				body.toLaTeX(Context.cons(context, boundVariable, domain), 0));
+		Context bodyContext = Context.cons(context, boundVariable, domain);
+		return parenthesize(precedence, 0, "\\lambda " + bodyContext.getVariableName(0) + (showDomains ? ": " + domain.toLaTeX(context, 0) : "") + ".\\; " +
+				body.toLaTeX(bodyContext, 0));
 	}
 	
 	@Override

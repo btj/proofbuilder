@@ -8,6 +8,7 @@ import java.util.Map;
 import proofbuilder.coq.Constant;
 import proofbuilder.coq.Context;
 import proofbuilder.coq.HolesContext;
+import proofbuilder.coq.Lambda;
 import proofbuilder.coq.ProofTree;
 import proofbuilder.coq.Term;
 import proofbuilder.coq.parser.Parser;
@@ -66,8 +67,25 @@ public class NamedProofTreesFactory {
 		ArrayList<NamedProofTree> result = new ArrayList<>();
 		
 		infixOperator("or", "Prop -> Prop -> Prop", "\\lor", Term.PREC_DISJ, Term.PREC_DISJ + 1, Term.PREC_DISJ);
-		parameter("exists", "forall (T: Type), (T -> Prop) -> Prop");
-		parameter("not", "Prop -> Prop");
+		constants.put("exists", new Constant("exists", parseType("forall (T: Type), (T -> Prop) -> Prop"), "\\exists", 2) {
+			@Override
+			public String toLaTeX(Context context, List<Term> arguments, int targetPrecedence) {
+				String latex;
+				Term body = arguments.get(1);
+				if (body instanceof Lambda lambda)
+					latex = "\\exists " + lambda.boundVariable + ".\\ " + lambda.body.toLaTeX(Context.cons(context, lambda.boundVariable, lambda.domain), 0);
+				else
+					latex = "\\exists(" + arguments.get(0).toLaTeX(context, 0) + ")(" + body.toLaTeX(context, 0) + ")";
+				return parenthesize(targetPrecedence, Term.PREC_QUANT, latex);
+			}
+			
+		});
+		constants.put("not", new Constant("not", parseType("Prop -> Prop"), "\\lnot", 1) {
+			@Override
+			public String toLaTeX(Context context, List<Term> arguments, int targetPrecedence) {
+				return parenthesize(targetPrecedence, Term.PREC_NOT, "\\lnot " + arguments.get(0).toLaTeX(context, Term.PREC_NOT));
+			}
+		});
 		parameter("False", "Prop");
 		
 		rule("not_intro", "forall P: Prop, (P -> False) -> not P", "\\lnot_I", 2);

@@ -125,6 +125,7 @@ public abstract class Term {
 	public static final int PREC_CONJ = 90;
 	public static final int PREC_DISJ = 88;
 	public static final int PREC_IMPL = 80;
+	public static final int PREC_QUANT = 50;
 	
 	public static String parenthesize(int targetPrecedence, int actualPrecedence, String text) {
 		if (targetPrecedence > actualPrecedence)

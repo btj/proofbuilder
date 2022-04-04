@@ -100,9 +100,11 @@ public class Product extends Term {
 	public String toLaTeX(Context context, int precedence) {
 		if (boundVariable == null)
 			return parenthesize(precedence, PREC_IMPL, domain.toLaTeX(context, PREC_IMPL + 1) + " \\Rightarrow " + range.toLaTeX(context, PREC_IMPL));
-		else
-			return parenthesize(precedence, 0, "\\forall " + boundVariable + (showDomains ? ": " + domain.toLaTeX(context, 0) : "") + ".\\; " +
-					range.toLaTeX(Context.cons(context, boundVariable, domain), 0));
+		else {
+			Context bodyContext = Context.cons(context, boundVariable, domain);
+			return parenthesize(precedence, 0, "\\forall " + bodyContext.getVariableName(0) + (showDomains ? ": " + domain.toLaTeX(context, 0) : "") + ".\\; " +
+					range.toLaTeX(bodyContext, 0));
+		}
 	}
 	
 	public Term reduce() {
