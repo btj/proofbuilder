@@ -1,0 +1,3 @@
+[submodule "jlatexmath"]
+	path = jlatexmath
+	url = https://github.com/btj/jlatexmath
