@@ -12,8 +12,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - uses: actions/setup-java@v2
+        with:
+          distribution: temurin
+          java-version: 17
       - name: Build .jar
-        run: ./build.sh
+        run: ./build-jar.sh
       - name: Upload .jar
         uses: actions/upload-artifact@v2.3.0
         with:
