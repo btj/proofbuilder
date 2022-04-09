@@ -40,7 +40,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: jar
-          path: target
+          path: proofbuilder/target
       - name: Build release .zip
         shell: bash
         run: ./build-windows.sh
@@ -64,7 +64,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: jar
-          path: target
+          path: proofbuilder/target
       - name: Build release .zip
         shell: bash
         run: ./build-macos.sh
@@ -84,6 +84,11 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
+      - name: Download .jar
+        uses: actions/download-artifact@v3
+        with:
+          name: jar
+          path: proofbuilder/target
       - name: Build release .zip
         run: ./build-linux.sh
       - name: Upload release .zip
