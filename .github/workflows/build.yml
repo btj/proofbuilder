@@ -87,7 +87,7 @@ jobs:
       - name: Build release .zip
         run: ./build-linux.sh
       - name: Upload release .zip
-        uses: artifacts/upload-artifact@v2.3.0
+        uses: actions/upload-artifact@v2.3.0
         with:
           name: Linux release
           path: proofbuilder/ProofBuilder-linux.txz
