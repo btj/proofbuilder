@@ -82,7 +82,7 @@ jobs:
         run: |
           set -x
           cd proofbuilder
-          jpackage --verbose -p target/proofbuilder-0.0.1-SNAPSHOT-jar-with-dependencies.jar -m proofbuilder/proofbuilder.ProofBuilderFrame --name ProofBuilder --type app-image --mac-sign --mac-signing-keychain ../apple_developer_id.keychain-db --mac-signing-key-user-name 6C42VUP45N
+          jpackage --verbose -p target/proofbuilder-0.0.1-SNAPSHOT-jar-with-dependencies.jar -m proofbuilder/proofbuilder.ProofBuilderFrame --name ProofBuilder --type app-image --mac-sign
           zip -ry ProofBuilder-macos-unstapled.zip ProofBuilder.app
           xcrun notarytool submit ProofBuilder-macos-unstapled.zip --keychain-profile AC_PASSWORD --wait
           xcrun stapler staple ProofBuilder.app
