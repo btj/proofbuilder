@@ -68,6 +68,7 @@ jobs:
       - name: Install Apple Developer ID
         env:
           APPLE_DEVELOPER_ID: ${{ secrets.APPLE_DEVELOPER_ID }}
+          APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
         run: |
           echo -n "$APPLE_DEVELOPER_ID" | base64 --decode --output apple_developer_id.p12
           security create-keychain -p '' apple_developer_id.keychain-db
@@ -79,6 +80,7 @@ jobs:
           security find-certificate -a -c 'Developer ID'
           security unlock-keychain -p '' apple_developer_id.keychain-db
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k '' apple_developer_id.keychain-db
+          notarytool store-credentials APPLE_ID_PASSWORD --apple-id bart.a.jacobs@gmail.com --team-id 6C42VUP45N --password "$APPLE_ID_PASSWORD"
       - name: Build release .zip
         shell: bash
         run: |
@@ -86,7 +88,7 @@ jobs:
           cd proofbuilder
           jpackage --verbose -p target/proofbuilder-0.0.1-SNAPSHOT-jar-with-dependencies.jar -m proofbuilder/proofbuilder.ProofBuilderFrame --name ProofBuilder --type app-image --mac-sign | tee log.txt
           zip -ry ProofBuilder-macos-unstapled.zip ProofBuilder.app
-          xcrun notarytool submit ProofBuilder-macos-unstapled.zip --keychain-profile AC_PASSWORD --wait
+          xcrun notarytool submit ProofBuilder-macos-unstapled.zip --keychain-profile APPLE_ID_PASSWORD --wait
           xcrun stapler staple ProofBuilder.app
           zip -ry ProofBuilder-macos.zip ProofBuilder.app
       - name: Upload log
