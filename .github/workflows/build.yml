@@ -88,7 +88,7 @@ jobs:
           xcrun stapler staple ProofBuilder.app
           zip -ry ProofBuilder-macos.zip ProofBuilder.app
       - name: Upload log
-        if: ${{ failure() }}
+        if: ${{ cancelled() }}
         uses: actions/upload-artifact@v2.3.0
         with:
           name: Log
