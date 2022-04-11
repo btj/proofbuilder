@@ -74,13 +74,15 @@ jobs:
           security set-keychain-settings -lut 21600 apple_developer_id.keychain-db
           security unlock-keychain -p '' apple_developer_id.keychain-db
           security import apple_developer_id.p12 -P '' -A -t cert -f pkcs12 -k apple_developer_id.keychain-db
-          security list-keychain -d user -s apple_developer_id.keychain-db
+          security list-keychains -d user -s apple_developer_id.keychain-db
+          security list-keychains -d user
+          security find-certificate -a -c 'Developer ID'
       - name: Build release .zip
         shell: bash
         run: |
           set -x
           cd proofbuilder
-          jpackage --verbose -p target/proofbuilder-0.0.1-SNAPSHOT-jar-with-dependencies.jar -m proofbuilder/proofbuilder.ProofBuilderFrame --name ProofBuilder --type app-image --mac-sign --mac-signing-keychain ../apple_developer_id.keychain-db
+          jpackage --verbose -p target/proofbuilder-0.0.1-SNAPSHOT-jar-with-dependencies.jar -m proofbuilder/proofbuilder.ProofBuilderFrame --name ProofBuilder --type app-image --mac-sign --mac-signing-keychain ../apple_developer_id.keychain-db --mac-signing-key-user-name 6C42VUP45N
           zip -ry ProofBuilder-macos-unstapled.zip ProofBuilder.app
           xcrun notarytool submit ProofBuilder-macos-unstapled.zip --keychain-profile AC_PASSWORD --wait
           xcrun stapler staple ProofBuilder.app
