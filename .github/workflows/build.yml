@@ -65,9 +65,25 @@ jobs:
         with:
           name: jar
           path: proofbuilder/target
+      - name: Install Apple Developer ID
+        env:
+          APPLE_DEVELOPER_ID: ${{ secrets.APPLE_DEVELOPER_ID }}
+        run: |
+          echo -n "$APPLE_DEVELOPER_ID" | base64 --decode --output apple_developer_id.p12
+          security create-keychain -p '' apple_developer_id.keychain-db
+          security set-keychain-settings -lut 21600 apple_developer_id.keychain-db
+          security unlock-keychain -p '' apple_developer_id.keychain-db
+          security import apple_developer_id.p12 -p '' -A -t cert -f pkcs12 -k apple_developer_id.keychain-db
+          security list-keychain -d user -s apple_developer_id.keychain-db
       - name: Build release .zip
         shell: bash
-        run: ./build-macos.sh
+        run: |
+          cd proofbuilder
+          jpackage -p target/proofbuilder-0.0.1-SNAPSHOT-jar-with-dependencies.jar -m proofbuilder/proofbuilder.ProofBuilderFrame --name ProofBuilder --type app-image --mac-sign
+          zip -ry ProofBuilder-macos-unstapled.zip ProofBuilder.app
+          xcrun notarytool submit ProofBuilder-macos-unstapled.zip --keychain-profile AC_PASSWORD --wait
+          xcrun stapler staple ProofBuilder.app
+          zip -ry ProofBuilder-macos.zip ProofBuilder.app
       - name: Upload release .zip
         uses: actions/upload-artifact@v2.3.0
         with:
