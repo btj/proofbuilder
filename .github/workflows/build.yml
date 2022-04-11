@@ -77,6 +77,7 @@ jobs:
           security list-keychains -d user -s apple_developer_id.keychain-db
           security list-keychains -d user
           security find-certificate -a -c 'Developer ID'
+          security unlock-keychain -p '' apple_developer_id.keychain-db
       - name: Build release .zip
         shell: bash
         run: |
