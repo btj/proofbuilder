@@ -73,7 +73,7 @@ jobs:
           security create-keychain -p '' apple_developer_id.keychain-db
           security set-keychain-settings -lut 21600 apple_developer_id.keychain-db
           security unlock-keychain -p '' apple_developer_id.keychain-db
-          security import apple_developer_id.p12 -P '' -A -t cert -f pkcs12 -k apple_developer_id.keychain-db
+          security import apple_developer_id.p12 -P '' -A -t cert -f pkcs12 -k apple_developer_id.keychain-db -T /usr/bin/codesign
           security list-keychains -d user -s apple_developer_id.keychain-db
           security list-keychains -d user
           security find-certificate -a -c 'Developer ID'
