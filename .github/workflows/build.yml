@@ -74,7 +74,7 @@ jobs:
           security create-keychain -p '' apple_developer_id.keychain-db
           security set-keychain-settings -lut 21600 apple_developer_id.keychain-db
           security unlock-keychain -p '' apple_developer_id.keychain-db
-          security import apple_developer_id.p12 -P '' -A -t cert -f pkcs12 -k apple_developer_id.keychain-db -T /usr/bin/codesign
+          security import apple_developer_id.p12 -P '' -A -t cert -f pkcs12 -k apple_developer_id.keychain-db
           security list-keychains -d user -s apple_developer_id.keychain-db
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k '' apple_developer_id.keychain-db
           xcrun notarytool store-credentials APPLE_ID_PASSWORD --apple-id bart.a.jacobs@gmail.com --team-id 6C42VUP45N --password "$APPLE_ID_PASSWORD"
